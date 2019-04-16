@@ -1,4 +1,5 @@
 using Scriban;
+using ScribanExpress.Functions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,8 +11,10 @@ namespace ScribanExpress
     {
         private readonly IDictionary<string, object> functionary;
         private readonly ExpressionGenerator expressionGenerator;
+        private readonly FunctionLibary functionLibary;
         public ExpressTemplateManager()
         {
+            functionLibary = new FunctionLibary();
             expressionGenerator = new ExpressionGenerator();
             functionary = new ConcurrentDictionary<string, object>();
         }
@@ -27,14 +30,14 @@ namespace ScribanExpress
             if (!functionary.ContainsKey(templateText))
             {
                 var template = Template.Parse(templateText, null, null, null);
-                var expression = expressionGenerator.Generate<T,object>(template.Page.Body);
+                var expression = expressionGenerator.Generate<T, FunctionLibary>(template.Page.Body);
                 var compiled =  expression.Compile();
 
                 functionary.Add(templateText, compiled);
             }
 
 
-            return MapFunction(functionary[templateText] as Func<T, object,string>, null);
+            return MapFunction(functionary[templateText] as Func<T, FunctionLibary, string>, functionLibary);
         }
 
 

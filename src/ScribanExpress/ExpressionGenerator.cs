@@ -11,15 +11,21 @@ namespace ScribanExpress
 {
     public class ExpressionGenerator
     {
+        
         public ExpressionGenerator()
         {
+
         }
 
         public Expression<Func<T, Y, string>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
         {
             ParameterExpression TopLevelParameter = Expression.Parameter(typeof(T));
-            ParameterExpression LibaryParameter = Expression.Parameter(typeof(Y));
-            Expression currentExpression = Expression.Constant(String.Empty);
+            ParameterExpression LibraryParameter = Expression.Parameter(typeof(Y));
+            ParameterFinder parameterFinder = new ParameterFinder();
+            parameterFinder.AddType(LibraryParameter);
+            parameterFinder.AddType(TopLevelParameter);
+
+            Expression currentExpression = Expression.Constant(string.Empty);
             foreach (var statement in scriptBlockStatement.Statements)
             {
                 switch (statement)
@@ -29,54 +35,67 @@ namespace ScribanExpress
                         currentExpression = Expression.Add(currentExpression, constant, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
                         break;
                     case ScriptExpressionStatement scriptExpressionStatement:
-                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, TopLevelParameter);
+                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression,  parameterFinder, null);
                         expressionBody = AddToString(expressionBody);
                         currentExpression = Expression.Add(currentExpression, expressionBody, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
                         break;
                 }
             }
 
-            return Expression.Lambda<Func<T, Y, string>>(currentExpression, TopLevelParameter, LibaryParameter);
+            return Expression.Lambda<Func<T, Y, string>>(currentExpression, TopLevelParameter, LibraryParameter);
         }
 
 
 
-        public Expression GetExpressionBody(ScriptExpression scriptExpression, ParameterExpression topParameterExpression)
+        public Expression GetExpressionBody(ScriptExpression scriptExpression, ParameterFinder parameterFinder, List<Expression> arguments)
         {
             Expression currentExpression = null;
             switch (scriptExpression)
             {
                 case ScriptVariableGlobal scriptVariableGlobal:
-                    currentExpression = Expression.Property(topParameterExpression, scriptVariableGlobal.Name);
+                    var parameter = parameterFinder.Find(scriptVariableGlobal.Name);
+                    currentExpression = Expression.Property(parameter, scriptVariableGlobal.Name);
                     break;
                 case ScriptMemberExpression scriptMemberExpression:
-                    var memberTarget = GetExpressionBody(scriptMemberExpression.Target, topParameterExpression);
-                    var member = scriptMemberExpression.Member.Name;
-                    currentExpression = Expression.Property(memberTarget, member);
+                    // it's impossible to tell if we have a member or a method, so we check for both
+                    var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
+                    var memberName = scriptMemberExpression.Member.Name;
+
+                    if (ExpressionHelpers.PropertyExists(memberTarget.Type, memberName))
+                    {
+                        currentExpression = Expression.Property(memberTarget, memberName);
+                    }
+                    if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName))
+                    {
+                           var methodIfo = memberTarget.Type.GetMethod(memberName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.IgnoreCase); // at this point we want to pass in again, 
+                           var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
+                           currentExpression = methodCall;
+                    }
+
                     break;
                 case ScriptPipeCall scriptPipeCall:
-                    var fromExpression = GetExpressionBody(scriptPipeCall.From, topParameterExpression);
-                    var to = scriptPipeCall.To as ScriptMemberExpression;
+                     var fromExpression = GetExpressionBody(scriptPipeCall.From, parameterFinder, null);
+
+                    // may or may not have argments so will need two options here
+                    var toFunction = scriptPipeCall.To as ScriptFunctionCall;
+
+                    // prepare args (input type + ScriptFunctionCall args )
+                    var pipelineArgs = new List<Expression> { fromExpression };
+                    // todo only literal at the moment
+                    pipelineArgs.AddRange(toFunction.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType())));
+                    currentExpression = GetExpressionBody(toFunction.Target,  parameterFinder, pipelineArgs);
 
                     var targetObject = to.Target as ScriptVariableGlobal;
 
                     var targetInfo = GetTarget(targetObject);
 
-                    if (targetInfo.ScopeType == VariableType.Static)
-                    {
-                        var memberVariable = to.Member as ScriptVariableGlobal;
-                        var methodIfo = targetInfo.TargetType
-                            .GetMethod(memberVariable.Name, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.IgnoreCase); // at this point we want to pass in again, 
-                        var methodCall = Expression.Call(null, methodIfo, new Expression[] { fromExpression });
-                        currentExpression = methodCall;
-                    }
                     break;
                 case ScriptFunctionCall scriptFunctionCall:
                     //last item is not a  property, but a function, so we want to skip it, or a least make a call to the funtion
                     var targetobject = scriptFunctionCall.Target as ScriptMemberExpression; // this might be null lots
-                    var functionTarget = GetExpressionBody(targetobject.Target, topParameterExpression);
+                    var functionTarget = GetExpressionBody(targetobject.Target,  parameterFinder, null);
 
-                    //currently we only support Literal argurments
+                    //todo: currently we only support Literal argurments
                     var argList = scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
                     var methodName = targetobject.Member.Name;
                     currentExpression = Expression.Call(functionTarget, typeof(int).GetMethod(methodName, argList.Select(x => x.Type).ToArray()), argList);
