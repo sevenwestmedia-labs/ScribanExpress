@@ -14,10 +14,18 @@ namespace ScribanExpress.UnitTests.Models
 
         public string TestProperty => $"Bill";
 
-        public string MultString(string a, string b)
+        public string Swap(string a, string b)
         {
-            return a + b;
+            return  b + a;
         }
+
+        public string ReturnHello() => "Hello";
+
+        public string GetPersonName(Person person)
+        {
+            return $"{person.FirstName} {person.LastName}";
+        }
+
 
         public Deep Deep { get; set; }
         public string AppendConst(string value)

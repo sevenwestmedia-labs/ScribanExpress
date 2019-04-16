@@ -57,6 +57,11 @@ namespace ScribanExpress
                     var parameter = parameterFinder.Find(scriptVariableGlobal.Name);
                     currentExpression = Expression.Property(parameter, scriptVariableGlobal.Name);
                     break;
+
+                case ScriptLiteral scriptLiteral:
+                    currentExpression = Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());
+                    break;
+
                 case ScriptMemberExpression scriptMemberExpression:
                     // it's impossible to tell if we have a member or a method, so we check for both
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
@@ -73,8 +78,8 @@ namespace ScribanExpress
                         var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
                         currentExpression = methodCall;
                     }
-
                     break;
+
                 case ScriptPipeCall scriptPipeCall:
                     // I'm not a huge fan of this because it requires pushing args down to sub nodes, could cause issues with multi funtions tree
                     var fromExpression = GetExpressionBody(scriptPipeCall.From, parameterFinder, null);
@@ -102,7 +107,7 @@ namespace ScribanExpress
 
                     break;
                 case ScriptFunctionCall scriptFunctionCall:
-                    var args =  scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
+                    var args = scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null));
                     currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, args.ToList<Expression>());
                     
                     

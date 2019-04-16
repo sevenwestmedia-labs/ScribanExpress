@@ -23,9 +23,13 @@ namespace ScribanExpress.UnitTests
             };
         }
         [Theory]
-        [InlineData(@"{{ person.FirstName | Test.Deep.Append ""abc""}}", "Billyabc", "Function with params")]
+        [InlineData(@"{{ person.FirstName | Test.Deep.Append ""abc""}}", "Billyabc", "Deep Pipeline with params")]
         [InlineData(@"{{ person.FirstName | Test.Repeat }}", "BillyBilly", "standard pipline")]
+        [InlineData(@"{{ person.FirstName | Test.Swap ""abc"" }}", "abcBilly", "pipline multi args")]
+        [InlineData(@"{{ Test.ReturnHello  }}", "Hello", "function with no args")]
         [InlineData(@"{{ Test.Repeat  ""abc"" }}", "abcabc", "standard literal func")]
+        [InlineData(@"{{ Test.GetPersonName person }}", "Billy Bob", "rich argument")]
+        [InlineData(@"{{ Test.Repeat  Test.ReturnHello  }}", "HelloHello", "function to function")]
         public void Pipeline_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
