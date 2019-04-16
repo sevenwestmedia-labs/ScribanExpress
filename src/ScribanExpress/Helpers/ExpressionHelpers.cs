@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ScribanExpress.Helpers
@@ -11,9 +12,9 @@ namespace ScribanExpress.Helpers
             return type.GetProperty(propertyName) != null;
         }
 
-        public static bool MethodExists(Type type, string methodName)
+        public static bool MethodExists(Type type, string methodName, IEnumerable<Type> argTypes)
         {
-            return type.GetMethod(methodName) != null;
+            return type.GetMethod(methodName, (argTypes ?? Enumerable.Empty<Type>()).ToArray() ) != null;
         }
     }
 }

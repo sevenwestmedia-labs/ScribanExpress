@@ -1,4 +1,5 @@
 using Scriban.Syntax;
+using ScribanExpress.Helpers;
 using ScribanExpress.UnitTests.Globals;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace ScribanExpress
                         currentExpression = Expression.Add(currentExpression, constant, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
                         break;
                     case ScriptExpressionStatement scriptExpressionStatement:
-                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression,  parameterFinder, null);
+                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
                         expressionBody = AddToString(expressionBody);
                         currentExpression = Expression.Add(currentExpression, expressionBody, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
                         break;
@@ -65,40 +66,54 @@ namespace ScribanExpress
                     {
                         currentExpression = Expression.Property(memberTarget, memberName);
                     }
-                    if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName))
+                    var argumentTypeList = arguments?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
+                    if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName, argumentTypeList))
                     {
-                           var methodIfo = memberTarget.Type.GetMethod(memberName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.IgnoreCase); // at this point we want to pass in again, 
-                           var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
-                           currentExpression = methodCall;
+                        var methodIfo = memberTarget.Type.GetMethod(memberName, argumentTypeList.ToArray()); 
+                        var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
+                        currentExpression = methodCall;
                     }
 
                     break;
                 case ScriptPipeCall scriptPipeCall:
-                     var fromExpression = GetExpressionBody(scriptPipeCall.From, parameterFinder, null);
-
-                    // may or may not have argments so will need two options here
-                    var toFunction = scriptPipeCall.To as ScriptFunctionCall;
-
+                    // I'm not a huge fan of this because it requires pushing args down to sub nodes, could cause issues with multi funtions tree
+                    var fromExpression = GetExpressionBody(scriptPipeCall.From, parameterFinder, null);
                     // prepare args (input type + ScriptFunctionCall args )
                     var pipelineArgs = new List<Expression> { fromExpression };
-                    // todo only literal at the moment
-                    pipelineArgs.AddRange(toFunction.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType())));
-                    currentExpression = GetExpressionBody(toFunction.Target,  parameterFinder, pipelineArgs);
 
-                    var targetObject = to.Target as ScriptVariableGlobal;
+                    switch (scriptPipeCall.To)
+                    {
+                        case ScriptFunctionCall scriptFunctionCall:
+                            // todo only literal at the moment
+                            pipelineArgs.AddRange(scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType())));
+                            currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, pipelineArgs);
+                            break;
+                        case ScriptMemberExpression scriptMemberExpression:
+                            currentExpression = GetExpressionBody(scriptMemberExpression, parameterFinder, pipelineArgs);
+                            break;
+                            // todo break on default
+                    }
 
-                    var targetInfo = GetTarget(targetObject);
+                    // may or may not have argments so will need two options here
+                    //var toFunction = scriptPipeCall.To as ScriptFunctionCall;
+
+
+
 
                     break;
                 case ScriptFunctionCall scriptFunctionCall:
+                    var args =  scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
+                    currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, args.ToList<Expression>());
+                    
+                    
                     //last item is not a  property, but a function, so we want to skip it, or a least make a call to the funtion
-                    var targetobject = scriptFunctionCall.Target as ScriptMemberExpression; // this might be null lots
-                    var functionTarget = GetExpressionBody(targetobject.Target,  parameterFinder, null);
+                    //var targetobject = scriptFunctionCall.Target as ScriptMemberExpression; // this might be null lots
+                    //var functionTarget = GetExpressionBody(targetobject.Target, parameterFinder, null);
 
                     //todo: currently we only support Literal argurments
-                    var argList = scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
-                    var methodName = targetobject.Member.Name;
-                    currentExpression = Expression.Call(functionTarget, typeof(int).GetMethod(methodName, argList.Select(x => x.Type).ToArray()), argList);
+                 //   var argList = scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
+                //    var methodName = targetobject.Member.Name;
+                //    currentExpression = Expression.Call(functionTarget, typeof(int).GetMethod(methodName, argList.Select(x => x.Type).ToArray()), argList);
                     break;
             }
 

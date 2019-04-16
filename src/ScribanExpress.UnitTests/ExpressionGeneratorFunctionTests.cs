@@ -26,7 +26,7 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ person.FirstName | Test.Deep.Append ""abc""}}", "Billyabc", "Function with params")]
         [InlineData(@"{{ person.FirstName | Test.Repeat }}", "BillyBilly", "standard pipline")]
         [InlineData(@"{{ Test.Repeat  ""abc"" }}", "abcabc", "standard literal func")]
-        public void NamedStringProperty(string templateText, string resultText, string reason)
+        public void Pipeline_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
 
