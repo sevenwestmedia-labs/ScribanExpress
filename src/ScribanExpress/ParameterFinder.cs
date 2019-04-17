@@ -15,6 +15,7 @@ namespace ScribanExpress
             parameterStack = new Stack<ParameterExpression>();
            
         }
+
         public ParameterExpression Find(string propertyName)
         {
 

@@ -12,7 +12,7 @@ namespace ScribanExpress
 {
     public class ExpressionGenerator
     {
-        
+
         public ExpressionGenerator()
         {
 
@@ -74,7 +74,8 @@ namespace ScribanExpress
                     var argumentTypeList = arguments?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
                     if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName, argumentTypeList))
                     {
-                        var methodIfo = memberTarget.Type.GetMethod(memberName, argumentTypeList.ToArray()); 
+                        var methodIfo = memberTarget.Type.GetMethod(memberName, argumentTypeList.ToArray());
+                        //var methodIfo = memberTarget.Type.GetMethod(memberName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.IgnoreCase, argumentTypeList.ToArray()); // at this point we want to pass in again, 
                         var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
                         currentExpression = methodCall;
                     }
@@ -89,13 +90,17 @@ namespace ScribanExpress
                     switch (scriptPipeCall.To)
                     {
                         case ScriptFunctionCall scriptFunctionCall:
-                            // todo only literal at the moment
-                            pipelineArgs.AddRange(scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType())));
+                            pipelineArgs.AddRange(scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null)));
                             currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, pipelineArgs);
                             break;
                         case ScriptMemberExpression scriptMemberExpression:
                             currentExpression = GetExpressionBody(scriptMemberExpression, parameterFinder, pipelineArgs);
                             break;
+                        case ScriptPipeCall toScriptPipeCall:
+                            var nestedfromExpression = GetExpressionBody(toScriptPipeCall.From, parameterFinder, pipelineArgs);
+                            currentExpression = GetExpressionBody(toScriptPipeCall.To, parameterFinder, new List<Expression> { nestedfromExpression });
+                            break;
+
                             // todo break on default
                     }
 

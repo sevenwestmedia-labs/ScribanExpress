@@ -26,6 +26,12 @@ namespace ScribanExpress.UnitTests.Models
             return $"{person.FirstName} {person.LastName}";
         }
 
+        public string PrefixPerson(string prefix, Person person)
+        {
+            return $"{prefix} {person.LastName}";
+        }
+
+
 
         public Deep Deep { get; set; }
         public string AppendConst(string value)

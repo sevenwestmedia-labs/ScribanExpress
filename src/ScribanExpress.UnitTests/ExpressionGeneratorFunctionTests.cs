@@ -18,14 +18,18 @@ namespace ScribanExpress.UnitTests
             person = new Person()
             {
                 FirstName = "Billy",
+                LastName = "Bob",
                 Age = 23,
                 Company = new Company { Title = "compname" }
             };
         }
+
         [Theory]
         [InlineData(@"{{ person.FirstName | Test.Deep.Append ""abc""}}", "Billyabc", "Deep Pipeline with params")]
         [InlineData(@"{{ person.FirstName | Test.Repeat }}", "BillyBilly", "standard pipline")]
         [InlineData(@"{{ person.FirstName | Test.Swap ""abc"" }}", "abcBilly", "pipline multi args")]
+        [InlineData(@"{{ ""Mr"" | Test.PrefixPerson  person }}", "Mr Bob", "pipline with rich parameter")]
+        [InlineData(@"{{ person | Test.GetPersonName | Test.Swap ""abc"" }}", "abcBilly Bob", "multi pipline")]
         [InlineData(@"{{ Test.ReturnHello  }}", "Hello", "function with no args")]
         [InlineData(@"{{ Test.Repeat  ""abc"" }}", "abcabc", "standard literal func")]
         [InlineData(@"{{ Test.GetPersonName person }}", "Billy Bob", "rich argument")]
@@ -44,6 +48,10 @@ namespace ScribanExpress.UnitTests
 
             Assert.Equal(resultText, stringResult);
         }
+
+            //we need to error better for unknow method
+        // test with   var templateText = @"{{ person.FirstName | Test.Deep.Appender ""abc""}}";
+
 
         public Expression<Func<T, RootLibary, string>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
