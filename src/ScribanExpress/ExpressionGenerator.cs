@@ -71,6 +71,9 @@ namespace ScribanExpress
                     {
                         currentExpression = Expression.Property(memberTarget, memberName);
                     }
+
+                    // TODO: we should remove the need to calculate a method with Args here, should not need to pass down info
+                    // still need the argument list as ScriptPipeCall still needs to pass the args in
                     var argumentTypeList = arguments?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
                     if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName, argumentTypeList))
                     {
@@ -104,73 +107,41 @@ namespace ScribanExpress
                             // todo break on default
                     }
 
-                    // may or may not have argments so will need two options here
-                    //var toFunction = scriptPipeCall.To as ScriptFunctionCall;
-
-
+                
 
 
                     break;
                 case ScriptFunctionCall scriptFunctionCall:
                     var args = scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null));
-                    currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, args.ToList<Expression>());
-                    
-                    
-                    //last item is not a  property, but a function, so we want to skip it, or a least make a call to the funtion
-                    //var targetobject = scriptFunctionCall.Target as ScriptMemberExpression; // this might be null lots
-                    //var functionTarget = GetExpressionBody(targetobject.Target, parameterFinder, null);
 
-                    //todo: currently we only support Literal argurments
-                 //   var argList = scriptFunctionCall.Arguments.Select(arg => Expression.Constant((arg as ScriptLiteral).Value, (arg as ScriptLiteral).Value.GetType()));
-                //    var methodName = targetobject.Member.Name;
-                //    currentExpression = Expression.Call(functionTarget, typeof(int).GetMethod(methodName, argList.Select(x => x.Type).ToArray()), argList);
+                    //add first argument if it's being supplied (probably from pipeline)
+                    if (arguments != null)
+                    {
+                        args = arguments.Union(args);
+                    }
+
+                    // we are attempting to pull the bottom target member up, so we know the method Name
+                    var toMember = scriptFunctionCall.Target as ScriptMemberExpression;
+                    if (toMember == null)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    else {
+                        var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
+                        var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
+                        var functionName = toMember.Member;
+                        var methodInfo = targetType.Type.GetMethod(functionName.Name, argumentTypes.ToArray());
+                        var methodCall = Expression.Call(targetType, methodInfo, args);
+                        currentExpression = methodCall;
+                    }
+
+                    //currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, args.ToList<Expression>());
                     break;
             }
 
             return currentExpression;
         }
 
-
         public Expression AddToString(Expression input) => (input.Type != typeof(string)) ? Expression.Call(input, "ToString", null, null) : input;
-
-
-
-
-        VariableType GetParameterScope(string paramter)
-        {
-            // we could just search ModelContext.Global
-            // or use variablestack, push and pop 
-            switch (paramter)
-            {
-                case "string":
-                    return VariableType.Static;
-                default:
-                    return VariableType.Model;
-            }
-        }
-
-        VariableInfo GetTarget(ScriptVariableGlobal scriptVariableGlobal)
-        {
-            var parameterScope = GetParameterScope(scriptVariableGlobal.Name);
-            if (parameterScope == VariableType.Static)
-                // bug: StringGlobals should not be referenced here 
-                return new VariableInfo { ScopeType = VariableType.Static, TargetType = typeof(StringGlobals) };
-            else
-                throw new NotImplementedException();
-
-        }
-
-    }
-
-    public enum VariableType
-    {
-        Model,
-        Static
-    }
-
-    public class VariableInfo
-    {
-        public VariableType ScopeType { get; set; }
-        public Type TargetType { get; set; }
     }
 }

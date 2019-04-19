@@ -30,11 +30,30 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ person.FirstName | Test.Swap ""abc"" }}", "abcBilly", "pipline multi args")]
         [InlineData(@"{{ ""Mr"" | Test.PrefixPerson  person }}", "Mr Bob", "pipline with rich parameter")]
         [InlineData(@"{{ person | Test.GetPersonName | Test.Swap ""abc"" }}", "abcBilly Bob", "multi pipline")]
+        public void Pipeline_Tests(string templateText, string resultText, string reason)
+        {
+            var presonwrapper = new { person };
+
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(presonwrapper, template.Page.Body);
+
+            var functor = result.Compile();
+
+            var stringResult = functor(presonwrapper, new RootLibary());
+
+            Assert.Equal(resultText, stringResult);
+        }
+
+
+
+        [Theory]
         [InlineData(@"{{ Test.ReturnHello  }}", "Hello", "function with no args")]
         [InlineData(@"{{ Test.Repeat  ""abc"" }}", "abcabc", "standard literal func")]
         [InlineData(@"{{ Test.GetPersonName person }}", "Billy Bob", "rich argument")]
         [InlineData(@"{{ Test.Repeat  Test.ReturnHello  }}", "HelloHello", "function to function")]
-        public void Pipeline_Tests(string templateText, string resultText, string reason)
+        [InlineData(@"{{ person.Company.GetCompanyName  true  }}", "COMPNAME", "function to function")]
+        public void Function_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
 
