@@ -1,6 +1,5 @@
 using Scriban.Syntax;
 using ScribanExpress.Helpers;
-using ScribanExpress.UnitTests.Globals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace ScribanExpress
         {
         }
 
-        public Expression<Action<StringBuilder,T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
+        public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
         {
             ParameterExpression StringBuilderParmeter = Expression.Parameter(typeof(StringBuilder));
             ParameterExpression TopLevelParameter = Expression.Parameter(typeof(T));
@@ -47,7 +46,7 @@ namespace ScribanExpress
                 }
             }
             var blockExpression = Expression.Block(statements);
-            return Expression.Lambda<Action<StringBuilder,T, Y>>(blockExpression, StringBuilderParmeter, TopLevelParameter, LibraryParameter);
+            return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, TopLevelParameter, LibraryParameter);
         }
 
 
@@ -79,11 +78,12 @@ namespace ScribanExpress
                     // TODO: we should remove the need to calculate a method with Args here, should not need to pass down info
                     // still need the argument list as ScriptPipeCall still needs to pass the args in
                     var argumentTypeList = arguments?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
-                    if (ExpressionHelpers.MethodExists(memberTarget.Type, memberName, argumentTypeList))
+                    var methodInfo = ExpressionHelpers.GetMethod(memberTarget.Type, memberName, argumentTypeList);
+
+                    if (methodInfo != null)
                     {
-                        var methodIfo = memberTarget.Type.GetMethod(memberName, argumentTypeList.ToArray());
-                        //var methodIfo = memberTarget.Type.GetMethod(memberName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.IgnoreCase, argumentTypeList.ToArray()); // at this point we want to pass in again, 
-                        var methodCall = Expression.Call(memberTarget, methodIfo, arguments);
+                        var callTarget = methodInfo.IsStatic ? null : memberTarget;
+                        var methodCall = Expression.Call(callTarget, methodInfo, arguments);
                         currentExpression = methodCall;
                     }
                     break;

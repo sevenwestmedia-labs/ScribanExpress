@@ -1,4 +1,5 @@
 using Scriban;
+using ScribanExpress.Abstractions;
 using ScribanExpress.Functions;
 using System;
 using System.Collections.Concurrent;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace ScribanExpress
 {
-    public class ExpressTemplateManager
+    public class ExpressTemplateManager: IExpressTemplateManager
     {
         private readonly IDictionary<string, object> functionary;
         private readonly ExpressionGenerator expressionGenerator;
@@ -35,7 +36,6 @@ namespace ScribanExpress
                 functionary.Add(templateText, compiled);
             }
 
-
             return MapFunction(functionary[templateText] as Action<StringBuilder,T, FunctionLibary>, functionLibary);
         }
 
@@ -44,6 +44,7 @@ namespace ScribanExpress
         {
             Func<T, string> returnFunc = x => {
                 StringBuilder sb = new StringBuilder();
+                //try catch here? or per statement?
                 input(sb, x, libary);
                 return sb.ToString();
             };

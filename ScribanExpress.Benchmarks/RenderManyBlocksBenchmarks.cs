@@ -35,7 +35,6 @@ namespace ScribanExpress.Benchmarks
         [Benchmark]
         public string ExplateRenderManyBlocks()
         {
-            // | RenderManyBlocks | 2.731 us | 0.0204 us | 0.0180 us |
             return expressTemplateManager.Render(templateText, new { Name = "World" });
         }
 

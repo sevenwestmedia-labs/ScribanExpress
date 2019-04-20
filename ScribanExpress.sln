@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScribanExpress.UnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribanExpress.Benchmarks", "ScribanExpress.Benchmarks\ScribanExpress.Benchmarks.csproj", "{1990ACA3-6310-434C-A495-D1EE658E50DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribanExpress.AspNetCore", "ScribanExpress.AspNetCore\ScribanExpress.AspNetCore.csproj", "{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1990ACA3-6310-434C-A495-D1EE658E50DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1990ACA3-6310-434C-A495-D1EE658E50DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1990ACA3-6310-434C-A495-D1EE658E50DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
