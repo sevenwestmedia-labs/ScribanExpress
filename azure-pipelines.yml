@@ -23,5 +23,8 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
+    nobuild: true
     versioningScheme: 'byBuildNumber'
+     
+
 
