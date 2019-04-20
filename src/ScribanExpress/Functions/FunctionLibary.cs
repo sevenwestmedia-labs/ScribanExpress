@@ -11,10 +11,13 @@ namespace ScribanExpress.Functions
         {
             Date = new DateTimeFunctions();
             String = new StringFunctions();
+            TimeSpan = new TimeSpanFunctions();
         }
 
         public DateTimeFunctions Date { get; }
 
         public StringFunctions String { get; }
+
+        public TimeSpanFunctions TimeSpan { get; }
     }
 }

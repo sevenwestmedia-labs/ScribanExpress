@@ -70,7 +70,8 @@ namespace ScribanExpress
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
                     var memberName = scriptMemberExpression.Member.Name;
 
-                    if (ExpressionHelpers.PropertyExists(memberTarget.Type, memberName))
+                    var property = ExpressionHelpers.GetProperty(memberTarget.Type, memberName);
+                    if (property != null)
                     {
                         currentExpression = Expression.Property(memberTarget, memberName);
                     }
@@ -82,10 +83,9 @@ namespace ScribanExpress
 
                     if (methodInfo != null)
                     {
-                        var callTarget = methodInfo.IsStatic ? null : memberTarget;
-                        var methodCall = Expression.Call(callTarget, methodInfo, arguments);
-                        currentExpression = methodCall;
+                        currentExpression = ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
                     }
+
                     break;
 
                 case ScriptPipeCall scriptPipeCall:
@@ -115,6 +115,9 @@ namespace ScribanExpress
                 case ScriptFunctionCall scriptFunctionCall:
                     currentExpression = CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
                     break;
+                case ScriptNestedExpression scriptNestedExpression:
+                    currentExpression = GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
+                    break;
             }
 
             return currentExpression;
@@ -140,9 +143,8 @@ namespace ScribanExpress
                 var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
                 var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
                 var functionName = toMember.Member;
-                var methodInfo = targetType.Type.GetMethod(functionName.Name, argumentTypes.ToArray());
-                var methodCall = Expression.Call(targetType, methodInfo, args);
-                return methodCall;
+                var methodInfo =  ExpressionHelpers.GetMethod(targetType.Type, functionName.Name, argumentTypes.ToArray());
+                return ExpressionHelpers.CallMethod(methodInfo, targetType, args);
             }
         }
 

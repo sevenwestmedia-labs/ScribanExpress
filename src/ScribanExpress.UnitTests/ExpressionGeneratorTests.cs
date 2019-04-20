@@ -146,7 +146,7 @@ namespace ScribanExpress.UnitTests
         }
 
 
-        [Fact]
+        [Fact(Skip = "Should display a proper error or just return a space")]
         public void Pipeline()
         {
             var personWrapper = new { person };
@@ -164,6 +164,7 @@ namespace ScribanExpress.UnitTests
 
             Assert.Equal("billy", sb.ToString());
         }
+
         [Fact]
         public void Method_WithParameters_OnProperty()
         {

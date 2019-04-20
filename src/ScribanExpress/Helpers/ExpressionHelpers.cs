@@ -11,19 +11,26 @@ namespace ScribanExpress.Helpers
     {
 
 
-        public static bool PropertyExists(Type type, string propertyName)
+        public static PropertyInfo GetProperty(Type type, string memberName)
         {
-            return type.GetProperty(propertyName) != null;
+            return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance  | BindingFlags.Public);
+            
         }
-
-        public static bool MethodExists(Type type, string methodName, IEnumerable<Type> argTypes)
-        {
-            return type.GetMethod(methodName, (argTypes ?? Enumerable.Empty<Type>()).ToArray() ) != null;
-        }
-
         public static MethodInfo GetMethod(Type type, string methodName, IEnumerable<Type> argumentTypes)
         {
             return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, null, argumentTypes?.ToArray(), null);
+        }
+
+        public static MethodCallExpression CallMethod(MethodInfo methodInfo, Expression targetObject, IEnumerable<Expression> arguments)
+        {
+            if (methodInfo.IsStatic)
+            {
+                return Expression.Call(null, methodInfo, arguments);
+            }
+            else
+            {
+                return Expression.Call(targetObject, methodInfo, arguments);
+            }
         }
 
 
