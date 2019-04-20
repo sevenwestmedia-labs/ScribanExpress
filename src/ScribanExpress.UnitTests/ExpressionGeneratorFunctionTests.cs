@@ -40,9 +40,10 @@ namespace ScribanExpress.UnitTests
 
             var functor = result.Compile();
 
-            var stringResult = functor(presonwrapper, new RootLibary());
+            var sb = new StringBuilder();
+            functor(sb, presonwrapper, new RootLibary());
 
-            Assert.Equal(resultText, stringResult);
+            Assert.Equal(resultText, sb.ToString());
         }
 
 
@@ -62,17 +63,20 @@ namespace ScribanExpress.UnitTests
             var result = AnonGenerate(presonwrapper, template.Page.Body);
 
             var functor = result.Compile();
+            var sb = new StringBuilder();
 
-            var stringResult = functor(presonwrapper, new RootLibary());
+            functor(sb, presonwrapper, new RootLibary());
 
-            Assert.Equal(resultText, stringResult);
+
+            Assert.Equal(resultText, sb.ToString());
         }
 
-            //we need to error better for unknow method
+
+        //we need to error better for unknow method
         // test with   var templateText = @"{{ person.FirstName | Test.Deep.Appender ""abc""}}";
 
 
-        public Expression<Func<T, RootLibary, string>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
+        public Expression<Action<StringBuilder,T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, RootLibary>(scriptBlockStatement);
         }

@@ -12,38 +12,42 @@ namespace ScribanExpress
 {
     public class ExpressionGenerator
     {
-
         public ExpressionGenerator()
         {
-
         }
 
-        public Expression<Func<T, Y, string>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
+        public Expression<Action<StringBuilder,T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
         {
+            ParameterExpression StringBuilderParmeter = Expression.Parameter(typeof(StringBuilder));
             ParameterExpression TopLevelParameter = Expression.Parameter(typeof(T));
             ParameterExpression LibraryParameter = Expression.Parameter(typeof(Y));
+
             ParameterFinder parameterFinder = new ParameterFinder();
             parameterFinder.AddType(LibraryParameter);
             parameterFinder.AddType(TopLevelParameter);
 
-            Expression currentExpression = Expression.Constant(string.Empty);
+            List<Expression> statements = new List<Expression>();
+            var appendMethodInfo = StringBuilderParmeter.Type.GetMethod("Append", new[] { typeof(string) });
+
             foreach (var statement in scriptBlockStatement.Statements)
             {
                 switch (statement)
                 {
                     case ScriptRawStatement scriptRawStatement:
                         var constant = Expression.Constant(scriptRawStatement.ToString());
-                        currentExpression = Expression.Add(currentExpression, constant, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
+                        var methodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, constant);
+                        statements.Add(methodCall);
                         break;
                     case ScriptExpressionStatement scriptExpressionStatement:
                         var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
                         expressionBody = AddToString(expressionBody);
-                        currentExpression = Expression.Add(currentExpression, expressionBody, typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) }));
+                        var scriptmethodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, expressionBody);
+                        statements.Add(scriptmethodCall);
                         break;
                 }
             }
-
-            return Expression.Lambda<Func<T, Y, string>>(currentExpression, TopLevelParameter, LibraryParameter);
+            var blockExpression = Expression.Block(statements);
+            return Expression.Lambda<Action<StringBuilder,T, Y>>(blockExpression, StringBuilderParmeter, TopLevelParameter, LibraryParameter);
         }
 
 
@@ -107,39 +111,39 @@ namespace ScribanExpress
                             // todo break on default
                     }
 
-                
-
-
                     break;
                 case ScriptFunctionCall scriptFunctionCall:
-                    var args = scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null));
-
-                    //add first argument if it's being supplied (probably from pipeline)
-                    if (arguments != null)
-                    {
-                        args = arguments.Union(args);
-                    }
-
-                    // we are attempting to pull the bottom target member up, so we know the method Name
-                    var toMember = scriptFunctionCall.Target as ScriptMemberExpression;
-                    if (toMember == null)
-                    {
-                        throw new NotSupportedException();
-                    }
-                    else {
-                        var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
-                        var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
-                        var functionName = toMember.Member;
-                        var methodInfo = targetType.Type.GetMethod(functionName.Name, argumentTypes.ToArray());
-                        var methodCall = Expression.Call(targetType, methodInfo, args);
-                        currentExpression = methodCall;
-                    }
-
-                    //currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, args.ToList<Expression>());
+                    currentExpression = CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
                     break;
             }
 
             return currentExpression;
+        }
+
+        public Expression CalculateScriptFunctionCall(ScriptFunctionCall scriptFunctionCall, ParameterFinder parameterFinder, List<Expression> arguments)
+        {
+            var args = scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null));
+            //add first argument if it's being supplied (probably from ScriptPipeCall)
+            if (arguments != null)
+            {
+                args = arguments.Union(args);
+            }
+
+            // we are attempting to pull the bottom target member up, so we know the method Name
+            var toMember = scriptFunctionCall.Target as ScriptMemberExpression;
+            if (toMember == null)
+            {
+                throw new NotSupportedException();
+            }
+            else
+            {
+                var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
+                var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
+                var functionName = toMember.Member;
+                var methodInfo = targetType.Type.GetMethod(functionName.Name, argumentTypes.ToArray());
+                var methodCall = Expression.Call(targetType, methodInfo, args);
+                return methodCall;
+            }
         }
 
         public Expression AddToString(Expression input) => (input.Type != typeof(string)) ? Expression.Call(input, "ToString", null, null) : input;

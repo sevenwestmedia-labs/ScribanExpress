@@ -33,8 +33,10 @@ namespace ScribanExpress.UnitTests
             var result = new ExpressionGenerator().Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
+            var sb = new StringBuilder();
+            functor(sb, "doesn'tm atter", null);
 
-            Assert.Equal("This is a World from scriban!", functor("doesn'tm atter", null));
+            Assert.Equal("This is a World from scriban!", sb.ToString());
         }
 
 
@@ -46,10 +48,10 @@ namespace ScribanExpress.UnitTests
             scriptBlockStatement.Statements.Add(ScriptRawStatementHelper.CreateScriptRawStatement("second"));
 
             var result = new ExpressionGenerator().Generate<string, object>(scriptBlockStatement);
-
+            var sb = new StringBuilder();
             var functor = result.Compile();
-
-            Assert.Equal("firstsecond", functor("saasdf", null));
+            functor(sb, "saasdf", null);
+            Assert.Equal("firstsecond", sb.ToString() );
         }
 
 
@@ -62,10 +64,10 @@ namespace ScribanExpress.UnitTests
             var result = new ExpressionGenerator().Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
+            var sb = new StringBuilder();
+            functor(sb, "Hello", null);
 
-            var stringResult = functor("Hello", null);
-
-            Assert.Equal("This is a 5 World from scriban!", stringResult);
+            Assert.Equal("This is a 5 World from scriban!", sb.ToString());
         }
 
         [Fact]
@@ -80,9 +82,10 @@ namespace ScribanExpress.UnitTests
 
             var functor = result.Compile();
 
-            var stringResult = functor(presonwrapper, null);
+            var sb = new StringBuilder();
+            functor(sb, presonwrapper, null);
 
-            Assert.Equal("Billy", stringResult);
+            Assert.Equal("Billy", sb.ToString());
         }
 
         [Fact]
@@ -97,9 +100,10 @@ namespace ScribanExpress.UnitTests
 
             var functor = result.Compile();
 
-            var stringResult = functor(person, null);
+            var sb = new StringBuilder();
+            functor(sb, person, null);
 
-            Assert.Equal("", stringResult);
+            Assert.Equal("", sb.ToString());
         }
 
 
@@ -115,9 +119,12 @@ namespace ScribanExpress.UnitTests
             var result = AnonGenerate(personWrapper, template.Page.Body);
             var functor = result.Compile();
 
-            var stringResult = functor(personWrapper, null);
 
-            Assert.Equal("23", stringResult);
+
+            var sb = new StringBuilder();
+            functor(sb, personWrapper, null);
+
+            Assert.Equal("23", sb.ToString());
         }
 
         [Fact]
@@ -132,9 +139,10 @@ namespace ScribanExpress.UnitTests
 
             var functor = result.Compile();
 
-            var stringResult = functor(personWrapper, null);
+            var sb = new StringBuilder();
+            functor(sb, personWrapper, null);
 
-            Assert.Equal("compname", stringResult);
+            Assert.Equal("compname", sb.ToString());
         }
 
 
@@ -143,16 +151,18 @@ namespace ScribanExpress.UnitTests
         {
             var personWrapper = new { person };
 
-            var templateText = @"{{ person.FirstName | string.downcase }}"; //in our case it might be downcase
+            // string.downcase  doesn't exist so we should have a good error
+            var templateText = @"{{ person.FirstName | string.downcase }}"; 
             var template = Template.Parse(templateText, null, null, null);
 
             var result = AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
-            var stringResult = functor(personWrapper, null);
+            var sb = new StringBuilder();
+            functor(sb, personWrapper, null);
 
-            Assert.Equal("billy", stringResult);
+            Assert.Equal("billy", sb.ToString());
         }
         [Fact]
         public void Method_WithParameters_OnProperty()
@@ -166,9 +176,10 @@ namespace ScribanExpress.UnitTests
 
             var functor = result.Compile();
 
-            var stringResult = functor(personWrapper, null);
+            var sb = new StringBuilder();
+            functor(sb, personWrapper, null);
 
-            Assert.Equal("blah blah $23.00", stringResult);
+            Assert.Equal("blah blah $23.00", sb.ToString());
         }
 
 
@@ -205,13 +216,13 @@ namespace ScribanExpress.UnitTests
             var result = AnonGenerate(anon, template.Page.Body);
 
             var functor = result.Compile();
+            var sb = new StringBuilder();
+            functor(sb,anon, null);
 
-            var stringResult = functor(anon, null);
-
-            Assert.Equal("Billy Bob", stringResult);
+            Assert.Equal("Billy Bob", sb.ToString());
         }
 
-        public Expression<Func<T, object, string>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
+        public Expression<Action<StringBuilder,T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
         }

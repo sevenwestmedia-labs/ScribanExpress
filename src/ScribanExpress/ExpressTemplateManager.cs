@@ -26,7 +26,6 @@ namespace ScribanExpress
 
         private Func<T, string> GetFunc<T>(string templateText)
         {
-
             if (!functionary.ContainsKey(templateText))
             {
                 var template = Template.Parse(templateText, null, null, null);
@@ -37,13 +36,17 @@ namespace ScribanExpress
             }
 
 
-            return MapFunction(functionary[templateText] as Func<T, FunctionLibary, string>, functionLibary);
+            return MapFunction(functionary[templateText] as Action<StringBuilder,T, FunctionLibary>, functionLibary);
         }
 
 
-        private Func<T, string> MapFunction<T,Y>(Func<T,Y, string> input, Y libary)
+        private Func<T, string> MapFunction<T,Y>(Action<StringBuilder,T,Y> input, Y libary)
         {
-            Func<T, string> returnFunc = x => input(x, libary);
+            Func<T, string> returnFunc = x => {
+                StringBuilder sb = new StringBuilder();
+                input(sb, x, libary);
+                return sb.ToString();
+            };
             return returnFunc;
         }
     }
