@@ -25,46 +25,27 @@ namespace ScribanExpress
             parameterFinder.AddType(LibraryParameter);
             parameterFinder.AddType(InputParameter);
 
-            List<Expression> statements = new List<Expression>();
-            var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
-            foreach (var statement in scriptBlockStatement.Statements)
-            {
-                switch (statement)
-                {
-                    case ScriptRawStatement scriptRawStatement:
-                        var constant = Expression.Constant(scriptRawStatement.ToString());
-                        var methodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, constant);
-                        statements.Add(methodCall);
-                        break;
-                    case ScriptExpressionStatement scriptExpressionStatement:
-                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
-                        expressionBody = AddToString(expressionBody);
-                        var scriptmethodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, expressionBody);
-                        statements.Add(scriptmethodCall);
-                        break;
-                    case ScriptIfStatement scriptIfStatement:
-                        var predicateExpression = GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
+            var blockExpression = GetStatementBlock(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
 
-                        var trueStatementBlock = GetStatementBlock(StringBuilderParmeter, scriptIfStatement.Then, parameterFinder);
+            //List<Expression> statements = new List<Expression>();
+            //var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
-                        if (scriptIfStatement.Else != null)
-                        {
-                            var elseStatment = (scriptIfStatement.Else as ScriptElseStatement);
-                            var falseStatementBlock = GetStatementBlock(StringBuilderParmeter, elseStatment.Body, parameterFinder);
-                            ConditionalExpression ifThenElseExpr = Expression.IfThenElse(predicateExpression, trueStatementBlock, falseStatementBlock);
-                            statements.Add(ifThenElseExpr);
-                        }
-                        else
-                        {
-                            ConditionalExpression ifThenExpr = Expression.IfThen(predicateExpression, trueStatementBlock);
-                            statements.Add(ifThenExpr);
-                        }
-                        
-                        break;
-                }
-            }
-            var blockExpression = Expression.Block(statements);
+            //foreach (var statement in scriptBlockStatement.Statements)
+            //{
+            //    switch (statement)
+            //    {
+            //        case ScriptRawStatement scriptRawStatement:
+            //            var constant = Expression.Constant(scriptRawStatement.ToString());
+            //            var methodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, constant);
+            //            statements.Add(methodCall);
+            //            break;
+            //        case ScriptExpressionStatement scriptExpressionStatement:
+            //            var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
+            //            expressionBody = AddToString(expressionBody);
+            //            var scriptmethodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, expressionBody);
+            //            statements.Add(scriptmethodCall);
+            //            break;
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
@@ -84,6 +65,31 @@ namespace ScribanExpress
                         var methodCall = Expression.Call(stringBuilderParameter, appendMethodInfo, constant);
                         statements.Add(methodCall);
                         break;
+                    case ScriptExpressionStatement scriptExpressionStatement:
+                        var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
+                        expressionBody = AddToString(expressionBody);
+                        var scriptmethodCall = Expression.Call(stringBuilderParameter, appendMethodInfo, expressionBody);
+                        statements.Add(scriptmethodCall);
+                        break;
+                    case ScriptIfStatement scriptIfStatement:
+                        var predicateExpression = GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
+                        var trueStatementBlock = GetStatementBlock(stringBuilderParameter, scriptIfStatement.Then, parameterFinder);
+
+                        if (scriptIfStatement.Else != null)
+                        {
+                            var elseStatment = (scriptIfStatement.Else as ScriptElseStatement);
+                            var falseStatementBlock = GetStatementBlock(stringBuilderParameter, elseStatment.Body, parameterFinder);
+                            ConditionalExpression ifThenElseExpr = Expression.IfThenElse(predicateExpression, trueStatementBlock, falseStatementBlock);
+                            statements.Add(ifThenElseExpr);
+                        }
+                        else
+                        {
+                            ConditionalExpression ifThenExpr = Expression.IfThen(predicateExpression, trueStatementBlock);
+                            statements.Add(ifThenExpr);
+                        }
+
+                        break;
+
                 }
             }
             var blockExpression = Expression.Block(statements);
