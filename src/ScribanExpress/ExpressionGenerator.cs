@@ -26,8 +26,6 @@ namespace ScribanExpress
             parameterFinder.AddType(InputParameter);
 
             var blockExpression = GetStatementExpression(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
-
-            //List<Expression> statements = new List<Expression>();
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
@@ -63,6 +61,7 @@ namespace ScribanExpress
                         ConditionalExpression ifThenExpr = Expression.IfThen(predicateExpression, trueStatementBlock);
                         return ifThenExpr;
                     }
+
                 case ScriptElseStatement scriptElseStatement:
                     var elseStatmentExpression = GetStatementExpression(stringBuilderParameter, scriptElseStatement.Body, parameterFinder);
                     return elseStatmentExpression;
@@ -76,6 +75,19 @@ namespace ScribanExpress
                     var blockExpression = Expression.Block(statements);
                     return blockExpression;
 
+                case ScriptForStatement scriptForStatement:
+                    // foreach(item in items)
+                    var itemsExpression = GetExpressionBody(scriptForStatement.Iterator, parameterFinder, null);
+                    var itemVaribleName = (scriptForStatement.Variable as ScriptVariableGlobal).Name;
+                    var itemType = itemsExpression.Type.GenericTypeArguments[0];
+                    ParameterExpression itemVariable = Expression.Parameter(itemType, itemVaribleName);
+
+                    parameterFinder = parameterFinder.CreateScope();
+                    parameterFinder.AddLocalVariable(itemVariable);
+                    var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, parameterFinder);
+                    var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
+                    return foreachExpression;
+
                 default:
                     throw new NotImplementedException("Unknown ScriptStatement");
             }
@@ -88,8 +100,16 @@ namespace ScribanExpress
             switch (scriptExpression)
             {
                 case ScriptVariableGlobal scriptVariableGlobal:
-                    var parameter = parameterFinder.Find(scriptVariableGlobal.Name);
-                    currentExpression = Expression.Property(parameter, scriptVariableGlobal.Name);
+                    var parameter = parameterFinder.FindLocalVariable(scriptVariableGlobal.Name);
+                    if (parameter != null)
+                    {
+                        currentExpression = parameter;
+                    }
+                    else
+                    {
+                        var global = parameterFinder.FindGlobalObject(scriptVariableGlobal.Name);
+                        currentExpression = Expression.Property(global, scriptVariableGlobal.Name);
+                    }
                     break;
 
                 case ScriptLiteral scriptLiteral:
@@ -105,7 +125,7 @@ namespace ScribanExpress
                         default:
                             throw new NotImplementedException("Unknown ScriptUnaryOperator");
                     }
-                     
+
                     break;
                 case ScriptMemberExpression scriptMemberExpression:
                     // it's impossible to tell if we have a member or a method, so we check for both

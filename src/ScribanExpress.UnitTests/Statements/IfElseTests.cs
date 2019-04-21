@@ -94,6 +94,44 @@ namespace ScribanExpress.UnitTests
             functor(sb, itemWrapper, null);
             sb.ToString().ShouldContain(" all false");
         }
+
+
+        [Fact]
+        public void If_WithComplexBlock()
+        {
+            var itemWrapper = new { item = new { someValue = true } };
+            
+            var templateText = @"{{ if item.someValue }}value is {{ item.someValue.ToString.ToLower }}{{ end }}";
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(itemWrapper, template.Page.Body);
+
+            var functor = result.Compile();
+
+            var sb = new StringBuilder();
+            functor(sb, itemWrapper, null);
+
+            sb.ToString().ShouldBe("value is true");
+        }
+
+
+        [Fact]
+        public void If_WithNestedIf()
+        {
+            var itemWrapper = new { item = new { someValue = true }, someOtherValue = false  };
+
+            var templateText = @"{{ if item.someValue }}someValue is true.{{ if someOtherValue }}{{ else }}someOtherValue is false{{ end }}{{ end }}";
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(itemWrapper, template.Page.Body);
+
+            var functor = result.Compile();
+
+            var sb = new StringBuilder();
+            functor(sb, itemWrapper, null);
+
+            sb.ToString().ShouldBe("someValue is true.someOtherValue is false");
+        }
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
