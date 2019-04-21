@@ -16,7 +16,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\ '
+    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura '
 
 - task: DotNetCoreCLI@2
   inputs:
