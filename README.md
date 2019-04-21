@@ -26,3 +26,13 @@ dotnet build
  cd  ScribanExpress.Benchmarks
  dotnet run -c Release --f *
  ```
+
+
+ ## TODO
+ * Allow convertion in functions, e.g pass into double
+ * correct folder structure
+ * scriban renamer
+ * cache on input type(s)
+ * if else
+ * loops
+ * assignment

@@ -7,12 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScribanExpress", "src\Scrib
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScribanExpress.UnitTests", "src\ScribanExpress.UnitTests\ScribanExpress.UnitTests.csproj", "{1AB76A0D-4BC2-494C-8FCF-D2BC80EC2D89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribanExpress.Benchmarks", "ScribanExpress.Benchmarks\ScribanExpress.Benchmarks.csproj", "{1990ACA3-6310-434C-A495-D1EE658E50DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScribanExpress.Benchmarks", "ScribanExpress.Benchmarks\ScribanExpress.Benchmarks.csproj", "{1990ACA3-6310-434C-A495-D1EE658E50DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribanExpress.AspNetCore", "ScribanExpress.AspNetCore\ScribanExpress.AspNetCore.csproj", "{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScribanExpress.AspNetCore", "ScribanExpress.AspNetCore\ScribanExpress.AspNetCore.csproj", "{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7BA42BBA-B938-498E-87A3-2EE93A33E5E0}"
 	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -20,6 +20,13 @@ steps:
 #    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
     arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
 
+    # Would prefer to put a wildcard for cobertura.xml but not sure it works on sub directorys
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
+
 - task: DotNetCoreCLI@2
   displayName: Pack
   inputs:
@@ -32,11 +39,4 @@ steps:
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)'
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
-
-
-- script: cd $(Build.SourcesDirectory)
+- script: cd $(Build.SourcesDirectory) && ls

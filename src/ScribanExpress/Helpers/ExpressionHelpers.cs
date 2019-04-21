@@ -9,13 +9,11 @@ namespace ScribanExpress.Helpers
 {
     public class ExpressionHelpers
     {
-
-
         public static PropertyInfo GetProperty(Type type, string memberName)
         {
             return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance  | BindingFlags.Public);
-            
         }
+
         public static MethodInfo GetMethod(Type type, string methodName, IEnumerable<Type> argumentTypes)
         {
             return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, null, argumentTypes?.ToArray(), null);

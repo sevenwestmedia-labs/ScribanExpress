@@ -18,15 +18,15 @@ namespace ScribanExpress
         public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
         {
             ParameterExpression StringBuilderParmeter = Expression.Parameter(typeof(StringBuilder));
-            ParameterExpression TopLevelParameter = Expression.Parameter(typeof(T));
+            ParameterExpression InputParameter = Expression.Parameter(typeof(T));
             ParameterExpression LibraryParameter = Expression.Parameter(typeof(Y));
 
             ParameterFinder parameterFinder = new ParameterFinder();
             parameterFinder.AddType(LibraryParameter);
-            parameterFinder.AddType(TopLevelParameter);
+            parameterFinder.AddType(InputParameter);
 
             List<Expression> statements = new List<Expression>();
-            var appendMethodInfo = StringBuilderParmeter.Type.GetMethod("Append", new[] { typeof(string) });
+            var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
             foreach (var statement in scriptBlockStatement.Statements)
             {
@@ -43,13 +43,39 @@ namespace ScribanExpress
                         var scriptmethodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, expressionBody);
                         statements.Add(scriptmethodCall);
                         break;
+                    case ScriptIfStatement scriptIfStatement:
+                        var predicateExpression = GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
+                        var trueStatements = GetStatementBlock(StringBuilderParmeter, scriptIfStatement.Then);
+                        Expression ifThenElseExpr = Expression.IfThen(predicateExpression, trueStatements);
+                        statements.Add(ifThenElseExpr);
+                        break;
                 }
             }
             var blockExpression = Expression.Block(statements);
-            return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, TopLevelParameter, LibraryParameter);
+            return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
 
+
+        public BlockExpression GetStatementBlock(ParameterExpression stringBuilderParameter,ScriptBlockStatement scriptBlockStatement)
+        {
+            var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
+
+            List<Expression> statements = new List<Expression>();
+            foreach (var statement in scriptBlockStatement.Statements)
+            {
+                switch (statement)
+                {
+                    case ScriptRawStatement scriptRawStatement:
+                        var constant = Expression.Constant(scriptRawStatement.ToString());
+                        var methodCall = Expression.Call(stringBuilderParameter, appendMethodInfo, constant);
+                        statements.Add(methodCall);
+                        break;
+                }
+            }
+            var blockExpression = Expression.Block(statements);
+            return blockExpression;
+        }
 
         public Expression GetExpressionBody(ScriptExpression scriptExpression, ParameterFinder parameterFinder, List<Expression> arguments)
         {
@@ -69,12 +95,12 @@ namespace ScribanExpress
                     // it's impossible to tell if we have a member or a method, so we check for both
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
                     var memberName = scriptMemberExpression.Member.Name;
-
                     var property = ExpressionHelpers.GetProperty(memberTarget.Type, memberName);
                     if (property != null)
                     {
                         currentExpression = Expression.Property(memberTarget, memberName);
                     }
+
 
                     // TODO: we should remove the need to calculate a method with Args here, should not need to pass down info
                     // still need the argument list as ScriptPipeCall still needs to pass the args in
@@ -143,7 +169,7 @@ namespace ScribanExpress
                 var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
                 var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
                 var functionName = toMember.Member;
-                var methodInfo =  ExpressionHelpers.GetMethod(targetType.Type, functionName.Name, argumentTypes.ToArray());
+                var methodInfo = ExpressionHelpers.GetMethod(targetType.Type, functionName.Name, argumentTypes.ToArray());
                 return ExpressionHelpers.CallMethod(methodInfo, targetType, args);
             }
         }
