@@ -30,6 +30,22 @@ namespace ScribanExpress.UnitTests
         }
 
 
+        [Fact]
+        public void IfElse()
+        {
+            var presonwrapper = new { item = new { someValue = false } };
+
+            var templateText = @"{{ if item.someValue }}value is true{{ else }} value is not true {{ end }}";
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(presonwrapper, template.Page.Body);
+
+            var functor = result.Compile();
+
+            var sb = new StringBuilder();
+            functor(sb, presonwrapper, null);
+            sb.ToString().ShouldBe(" value is not true ");
+        }
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);

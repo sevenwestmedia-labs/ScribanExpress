@@ -45,9 +45,22 @@ namespace ScribanExpress
                         break;
                     case ScriptIfStatement scriptIfStatement:
                         var predicateExpression = GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
-                        var trueStatements = GetStatementBlock(StringBuilderParmeter, scriptIfStatement.Then);
-                        Expression ifThenElseExpr = Expression.IfThen(predicateExpression, trueStatements);
-                        statements.Add(ifThenElseExpr);
+
+                        var trueStatementBlock = GetStatementBlock(StringBuilderParmeter, scriptIfStatement.Then, parameterFinder);
+
+                        if (scriptIfStatement.Else != null)
+                        {
+                            var elseStatment = (scriptIfStatement.Else as ScriptElseStatement);
+                            var falseStatementBlock = GetStatementBlock(StringBuilderParmeter, elseStatment.Body, parameterFinder);
+                            ConditionalExpression ifThenElseExpr = Expression.IfThenElse(predicateExpression, trueStatementBlock, falseStatementBlock);
+                            statements.Add(ifThenElseExpr);
+                        }
+                        else
+                        {
+                            ConditionalExpression ifThenExpr = Expression.IfThen(predicateExpression, trueStatementBlock);
+                            statements.Add(ifThenExpr);
+                        }
+                        
                         break;
                 }
             }
@@ -57,7 +70,7 @@ namespace ScribanExpress
 
 
 
-        public BlockExpression GetStatementBlock(ParameterExpression stringBuilderParameter,ScriptBlockStatement scriptBlockStatement)
+        public BlockExpression GetStatementBlock(ParameterExpression stringBuilderParameter,ScriptBlockStatement scriptBlockStatement, ParameterFinder parameterFinder)
         {
             var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
