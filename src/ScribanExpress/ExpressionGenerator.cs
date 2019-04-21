@@ -25,33 +25,15 @@ namespace ScribanExpress
             parameterFinder.AddType(LibraryParameter);
             parameterFinder.AddType(InputParameter);
 
-
             var blockExpression = GetStatementBlock(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
 
             //List<Expression> statements = new List<Expression>();
-            //var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
-
-            //foreach (var statement in scriptBlockStatement.Statements)
-            //{
-            //    switch (statement)
-            //    {
-            //        case ScriptRawStatement scriptRawStatement:
-            //            var constant = Expression.Constant(scriptRawStatement.ToString());
-            //            var methodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, constant);
-            //            statements.Add(methodCall);
-            //            break;
-            //        case ScriptExpressionStatement scriptExpressionStatement:
-            //            var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
-            //            expressionBody = AddToString(expressionBody);
-            //            var scriptmethodCall = Expression.Call(StringBuilderParmeter, appendMethodInfo, expressionBody);
-            //            statements.Add(scriptmethodCall);
-            //            break;
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
 
 
-        public BlockExpression GetStatementBlock(ParameterExpression stringBuilderParameter,ScriptBlockStatement scriptBlockStatement, ParameterFinder parameterFinder)
+        public BlockExpression GetStatementBlock(ParameterExpression stringBuilderParameter, ScriptBlockStatement scriptBlockStatement, ParameterFinder parameterFinder)
         {
             var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
@@ -65,12 +47,14 @@ namespace ScribanExpress
                         var methodCall = Expression.Call(stringBuilderParameter, appendMethodInfo, constant);
                         statements.Add(methodCall);
                         break;
+
                     case ScriptExpressionStatement scriptExpressionStatement:
                         var expressionBody = GetExpressionBody(scriptExpressionStatement.Expression, parameterFinder, null);
                         expressionBody = AddToString(expressionBody);
                         var scriptmethodCall = Expression.Call(stringBuilderParameter, appendMethodInfo, expressionBody);
                         statements.Add(scriptmethodCall);
                         break;
+
                     case ScriptIfStatement scriptIfStatement:
                         var predicateExpression = GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
                         var trueStatementBlock = GetStatementBlock(stringBuilderParameter, scriptIfStatement.Then, parameterFinder);
@@ -109,7 +93,18 @@ namespace ScribanExpress
                 case ScriptLiteral scriptLiteral:
                     currentExpression = Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());
                     break;
-
+                case ScriptUnaryExpression scriptUnaryExpression:
+                    switch (scriptUnaryExpression.Operator)
+                    {
+                        case ScriptUnaryOperator.Not:
+                            var right = GetExpressionBody(scriptUnaryExpression.Right, parameterFinder, arguments);
+                            currentExpression = Expression.Not(right);
+                            break;
+                        default:
+                            throw new NotImplementedException("Unknown ScriptUnaryOperator");
+                    }
+                     
+                    break;
                 case ScriptMemberExpression scriptMemberExpression:
                     // it's impossible to tell if we have a member or a method, so we check for both
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);

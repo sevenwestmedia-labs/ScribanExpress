@@ -46,6 +46,25 @@ namespace ScribanExpress.UnitTests
             functor(sb, presonwrapper, null);
             sb.ToString().ShouldBe(" value is not true ");
         }
+
+
+        [Fact]
+        public void NotIf()
+        {
+            var presonwrapper = new { item = new { someValue = false } };
+
+            var templateText = @"{{ if !item.someValue }}value is false{{ end }}";
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(presonwrapper, template.Page.Body);
+
+            var functor = result.Compile();
+
+            var sb = new StringBuilder();
+            functor(sb, presonwrapper, null);
+            sb.ToString().ShouldBe("value is false");
+        }
+
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
