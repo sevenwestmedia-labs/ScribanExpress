@@ -13,6 +13,14 @@ namespace ScribanExpress.Benchmarks.Comparison
 {
     public class RenderProducts
     {
+        /* 2019-02-22 Products
+        |             Method |       Mean |     Error |    StdDev | Ratio |
+        |------------------- |-----------:|----------:|----------:|------:|
+        | ExpressProducts500 |   163.2 us | 0.8232 us | 0.6874 us |  0.13 |
+        | ScribanProducts500 | 1,273.9 us | 3.0741 us | 2.7251 us |  1.00 |
+        |   RazorProducts500 |   217.4 us | 1.0174 us | 0.9517 us |  0.17 |
+        */
+
         private readonly List<Product> products;
 
         private readonly ExpressTemplateManager expressTemplateManager;
