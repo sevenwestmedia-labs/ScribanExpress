@@ -45,6 +45,7 @@ dotnet build
  * list functions
 
  ## TODO
+ * Add basic logging, e.g log template parse
  * Allow convertion in functions, e.g pass into double
  * correct folder structure
  * assignment

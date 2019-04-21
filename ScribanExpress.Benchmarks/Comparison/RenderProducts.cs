@@ -75,7 +75,7 @@ namespace ScribanExpress.Benchmarks.Comparison
         }
 
         [Benchmark()]
-        public string TestRazor()
+        public string RazorProducts500()
         {
             dynamic expando = new ExpandoObject();
             expando.products = products;

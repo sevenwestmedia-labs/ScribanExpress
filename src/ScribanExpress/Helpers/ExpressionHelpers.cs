@@ -16,7 +16,7 @@ namespace ScribanExpress.Helpers
 
         public static MethodInfo GetMethod(Type type, string methodName, IEnumerable<Type> argumentTypes)
         {
-            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public, null, argumentTypes?.ToArray(), null);
+            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, null, argumentTypes?.ToArray(), null);
         }
 
         public static MethodCallExpression CallMethod(MethodInfo methodInfo, Expression targetObject, IEnumerable<Expression> arguments)
