@@ -14,10 +14,11 @@ steps:
   displayName: 'dotnet build $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  name: Test
   inputs:
     command: 'test'
-    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
-#    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
+#    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
+    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -33,4 +34,6 @@ steps:
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+    #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+    summaryFileLocation: '$(Build.SourcesDirectory)\TestResults\Coverage\coverage.cobertura.xml'
+    
