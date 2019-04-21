@@ -21,6 +21,7 @@ steps:
     arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
 
 - task: DotNetCoreCLI@2
+  displayName: Pack
   inputs:
     command: 'pack'
     versioningScheme: 'byPrereleaseNumber'
@@ -35,5 +36,7 @@ steps:
   inputs:
     codeCoverageTool: 'Cobertura'
     #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-    summaryFileLocation: '$(Build.SourcesDirectory)\TestResults\Coverage\coverage.cobertura.xml'
-    
+    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
+
+
+- script: cd $(Build.SourcesDirectory)
