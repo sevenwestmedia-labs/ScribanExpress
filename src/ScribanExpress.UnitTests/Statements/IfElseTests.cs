@@ -65,6 +65,35 @@ namespace ScribanExpress.UnitTests
             sb.ToString().ShouldBe("value is false");
         }
 
+        [Fact]
+        public void ElseIf()
+        {
+            var itemWrapper = new { item = new { someValue = false, someOtherValue = true  } };
+
+            var templateText = @"
+{{ if item.someValue }}
+  ...
+{{ else if  item.someOtherValue }}
+  some other value is true
+{{ else }}
+  all false
+{{ end }}";
+            var template = Template.Parse(templateText, null, null, null);
+
+            var result = AnonGenerate(itemWrapper, template.Page.Body);
+            var functor = result.Compile();
+
+            // test else if
+            var sb = new StringBuilder();
+            functor(sb, itemWrapper, null);
+            sb.ToString().ShouldContain("some other value is true");
+
+            // test else else
+            itemWrapper = new { item = new { someValue = false, someOtherValue = false } };
+            sb = new StringBuilder();
+            functor(sb, itemWrapper, null);
+            sb.ToString().ShouldContain(" all false");
+        }
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
