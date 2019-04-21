@@ -1,20 +1,28 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Scriban Express
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+* Scriban Express is desgined for rendering lots of small simple templates, quickly
+* Is is a subset of Scriban (mainly due to lack of time)
+* Compiles Scribans AST into Cached Expression Trees
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+* At this point Security has not been considered, templates should be controlled by trusted individuals
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Build and Test
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://www.visualstudio.com/en-us/docs/git/create-a-readme). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+### Build
+
+```pwsh
+dotnet build
+```
+
+### Tests
+
+```pwsh
+ dotnet test --logger trx  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura   /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*"
+```
+
+### Benchmarks
+
+ ```pwsh
+ cd  ScribanExpress.Benchmarks
+ dotnet run -c Release --f *
+ ```
