@@ -1,0 +1,78 @@
+﻿@page
+@model ScribanExpress.Demo.Pages.Movies.IndexModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+<div>
+
+</div>
+<div>
+    <h4>Examples</h4>
+    @foreach (var example in @Model.Examples)
+{
+    <div>
+        <p></p>
+        <blockquote name="example">@example</blockquote>
+    </div>
+}
+</div>
+
+<div class="alert alert-primary">
+    <label for="titleTemplate">Title:</label> <input id="titleTemplate" name="titleTemplate-input" value="asdfsd" autofocus class="form-control" />
+</div>
+
+<div>
+    <h6>Cards</h6>
+    <div id="cardPlaceholder" class="card-columns"></div>
+</div>
+
+<script>
+    const titleTemplateElement = document.querySelector('input[name="titleTemplate-input"]');
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('input[name="titleTemplate-input"]').oninput = changeEventHandler;
+    }, false);
+
+    document.querySelectorAll("blockquote")
+        .forEach(input => input.addEventListener("click", (e) => {
+            titleTemplateElement.value = e.target.innerText;
+            changeEventHandler();
+        }));
+
+
+    function changeEventHandler() {
+
+        let cardPlaceholder = document.querySelector('#cardPlaceholder');
+
+        fetch(`/api/Card?titleTemplate=${titleTemplateElement.value}`)
+            .then(response => {
+                return response.json().then(data => {
+                    console.log(data);
+                    removeChildren(cardPlaceholder);
+                    data.map(x => AddCard(cardPlaceholder, x));
+                });
+            });
+    }
+
+
+    function AddCard(targetNode, value) {
+        var html = `<div class="card ml-2 " style="width: 10rem;">
+                    <img class="card-img-top rounded-top" src="${value.url}" alt="Card image cap" >
+                        <div class="card-body">
+                            <p class="card-text">${value.title}</p>
+                        </div>
+                    </div >`;
+
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        var node = wrapper.firstChild;
+        targetNode.appendChild(node);
+    }
+
+    function removeChildren(node) {
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        range.deleteContents();
+    }
+</script>

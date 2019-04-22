@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ScribanExpress.AspNetCore.Extensions;
 
 namespace ScribanExpress.Demo
 {
@@ -32,6 +33,7 @@ namespace ScribanExpress.Demo
             });
 
 
+            services.AddScribanExpress();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

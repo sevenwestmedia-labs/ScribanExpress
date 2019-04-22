@@ -15,4 +15,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\ScribanExpress.AspNetCore\ScribanExpress.AspNetCore.csproj" />
+  </ItemGroup>
+
 </Project>
