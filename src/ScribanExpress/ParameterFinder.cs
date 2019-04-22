@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScribanExpress.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -21,10 +22,18 @@ namespace ScribanExpress
         {
             this.parentFinder = parent;
         }
-        public ParameterExpression Find(string propertyName)
-        {
 
-            return FindLocalVariable(propertyName) ?? FindGlobalObject(propertyName);
+        public Expression GetProperty(string propertyName)
+        {
+            var local = FindLocalVariable(propertyName);
+            if (local != null)
+            {
+                return local;
+            }
+            else {
+                var globalParam = FindGlobalObject(propertyName);
+                return Expression.Property(globalParam, propertyName);
+            }
         }
 
         public ParameterExpression FindLocalVariable(string propertyName)
@@ -36,6 +45,7 @@ namespace ScribanExpress
                     return parameterExpression;
                 }
             }
+
             if (parentFinder != null)
             {
                 return parentFinder.FindLocalVariable(propertyName);
@@ -47,12 +57,11 @@ namespace ScribanExpress
         {
             foreach (var parameterExpression in parameterStack)
             {
-                var propertyExists = parameterExpression.Type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase) != null;
+                var propertyExists = ExpressionHelpers.GetProperty(parameterExpression.Type, propertyName) != null;
                 if (propertyExists)
                 {
                     return parameterExpression;
                 }
-
             }
 
             if (parentFinder != null)

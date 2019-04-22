@@ -100,17 +100,9 @@ namespace ScribanExpress
             switch (scriptExpression)
             {
                 case ScriptVariableGlobal scriptVariableGlobal:
-                    var parameter = parameterFinder.FindLocalVariable(scriptVariableGlobal.Name);
-                    if (parameter != null)
-                    {
-                        currentExpression = parameter;
-                    }
-                    else
-                    {
-                        var global = parameterFinder.FindGlobalObject(scriptVariableGlobal.Name);
-                        currentExpression = Expression.Property(global, scriptVariableGlobal.Name);
-                    }
-                    break;
+                   var variable = parameterFinder.GetProperty(scriptVariableGlobal.Name);
+                   currentExpression = variable;
+                   break;
 
                 case ScriptLiteral scriptLiteral:
                     currentExpression = Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());

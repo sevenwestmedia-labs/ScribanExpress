@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using ScribanExpress.Benchmarks.Comparison;
 using System;
@@ -10,7 +11,12 @@ namespace ScribanExpress.Benchmarks
     {
         public static void Main(string[] args)
         {
+            // To debug (ONLY USE FOR DEBUGGING):
+            // BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
+
+            // To Run Specifc Benchmark
             //var summary = BenchmarkRunner.Run<RenderSimpleTemplate>();
+
             BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         }
     }

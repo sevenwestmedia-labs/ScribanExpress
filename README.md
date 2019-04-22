@@ -3,8 +3,8 @@
 * Scriban Express is desgined for rendering lots of small simple templates, quickly
 * Is is a subset of Scriban (mainly due to lack of time)
 * Compiles Scribans AST into Cached Expression Trees
-
 * At this point Security has not been considered, templates should be controlled by trusted individuals
+
 
 ## Build and Test
 
@@ -28,6 +28,7 @@ dotnet build
  ```
 
  ## MVP
+
  * Demo
  * Handle Errors { expression, errors}
 	Plan:	if a stament breaks, just log and skip

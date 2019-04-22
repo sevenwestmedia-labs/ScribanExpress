@@ -1,13 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Scriban;
-using Scriban.Runtime;
 using ScribanExpress.Benchmarks.Comparison.ThirdParty.Razor;
 using ScribanExpress.Benchmarks.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using System.Text;
 
 namespace ScribanExpress.Benchmarks.Comparison
 {
@@ -85,15 +83,15 @@ namespace ScribanExpress.Benchmarks.Comparison
         [Benchmark()]
         public string RazorProducts500()
         {
+            var sw = new StringWriter();
             dynamic expando = new ExpandoObject();
             expando.products = products;
             expando.truncate = new Func<string, int, string>((text, length) => Scriban.Functions.StringFunctions.Truncate(text, length));
-            // why here?
-            _razorTemplate.Output = new StringWriter();
+            _razorTemplate.Output = sw;
             _razorTemplate.Model = expando;
             _razorTemplate.Execute();
-            var result = _razorTemplate.Output.ToString();
-            return result;
+          
+            return sw.ToString();
         }
     }
 }

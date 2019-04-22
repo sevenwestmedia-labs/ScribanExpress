@@ -67,9 +67,7 @@ namespace ScribanExpress.Benchmarks
             _razorTemplate.Output = writer;
             _razorTemplate.Model = expando;
             _razorTemplate.Execute();
-            var result = _razorTemplate.Output.ToString();
-
-
+            
             return writer.ToString();
         }
     }

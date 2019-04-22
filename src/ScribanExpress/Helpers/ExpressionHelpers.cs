@@ -31,6 +31,7 @@ namespace ScribanExpress.Helpers
             }
         }
 
+        // https://stackoverflow.com/questions/27175558/foreach-loop-using-expression-trees
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
             var elementType = loopVar.Type;
