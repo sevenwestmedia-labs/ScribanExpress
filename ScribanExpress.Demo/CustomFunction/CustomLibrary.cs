@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ScribanExpress.Demo.CustomFunction
 {
-    public class CustomLibrary : FunctionLibary
+    public class CustomLibrary : StandardLibrary
     {
         public CustomLibrary()
         {

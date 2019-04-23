@@ -99,7 +99,7 @@ namespace ScribanExpress.UnitTests.Statements
 
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
+            return new StatementGenerator().Generate<T, object>(scriptBlockStatement);
         }
 
     }

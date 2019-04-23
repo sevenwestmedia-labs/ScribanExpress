@@ -10,7 +10,7 @@ namespace ScribanExpress.UnitTests.Helpers
     {
         public static IExpressTemplateManager CreateExpressTemplateManager()
         {
-            return new ExpressTemplateManager<FunctionLibary>(new FunctionLibary());
+            return new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
         }
         
     }

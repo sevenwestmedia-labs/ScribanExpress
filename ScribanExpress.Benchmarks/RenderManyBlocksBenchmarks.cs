@@ -41,7 +41,7 @@ namespace ScribanExpress.Benchmarks
         public RenderManyBlocksBenchmarks()
         {
             templateText = "Hello {{name}} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }}";
-            expressTemplateManager = new ExpressTemplateManager<FunctionLibary>(new FunctionLibary());
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
             scribanTemplate = Template.Parse(templateText);
             _razorTemplate = RazorBuilder.Compile(@"Hello @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name");
         }

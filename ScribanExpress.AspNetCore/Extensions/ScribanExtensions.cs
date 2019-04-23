@@ -12,12 +12,12 @@ namespace ScribanExpress.AspNetCore.Extensions
     {
         public static IServiceCollection AddScribanExpress(this IServiceCollection collection)
         {
-            collection.TryAddSingleton<IExpressTemplateManager, ExpressTemplateManager<FunctionLibary>>();
-            collection.TryAddSingleton<FunctionLibary>();
+            collection.TryAddSingleton<IExpressTemplateManager, ExpressTemplateManager<StandardLibrary>>();
+            collection.TryAddSingleton<StandardLibrary>();
             return collection;
         }
 
-        public static IServiceCollection AddScribanExpress<T>(this IServiceCollection collection) where T : FunctionLibary
+        public static IServiceCollection AddScribanExpress<T>(this IServiceCollection collection) where T : StandardLibrary
         {
             collection.TryAddSingleton<IExpressTemplateManager, ExpressTemplateManager<T>>();
             collection.TryAddSingleton<T>();

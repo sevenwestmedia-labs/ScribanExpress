@@ -53,12 +53,12 @@ namespace ScribanExpress.Benchmarks.Comparison
         | 'Scriban Hello 50' | 2,831.377 us | 29.7322 us | 27.8115 us | 1.000 |
         */
 
-        private readonly ExpressTemplateManager<FunctionLibary> expressTemplateManager;
+        private readonly ExpressTemplateManager<StandardLibrary> expressTemplateManager;
         private readonly Template scribanTemplate;
         private readonly RazorTemplatePage _razorTemplate;
         public RenderSimpleTemplate()
         {
-            expressTemplateManager = new ExpressTemplateManager<FunctionLibary>(new FunctionLibary());
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
             scribanTemplate = Template.Parse("Hello {{name}}!");
             _razorTemplate = RazorBuilder.Compile(@"Hello @Model.Name!");
         }

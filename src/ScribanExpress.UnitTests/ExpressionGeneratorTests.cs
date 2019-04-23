@@ -30,7 +30,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"This is a World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new ExpressionGenerator().Generate<string, object>(template.Page.Body);
+            var result = new StatementGenerator().Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -47,7 +47,7 @@ namespace ScribanExpress.UnitTests
             scriptBlockStatement.Statements.Add(ScriptRawStatementHelper.CreateScriptRawStatement("first"));
             scriptBlockStatement.Statements.Add(ScriptRawStatementHelper.CreateScriptRawStatement("second"));
 
-            var result = new ExpressionGenerator().Generate<string, object>(scriptBlockStatement);
+            var result = new StatementGenerator().Generate<string, object>(scriptBlockStatement);
             var sb = new StringBuilder();
             var functor = result.Compile();
             functor(sb, "saasdf", null);
@@ -61,7 +61,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"This is a {{ Length }} World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new ExpressionGenerator().Generate<string, object>(template.Page.Body);
+            var result = new StatementGenerator().Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -73,17 +73,17 @@ namespace ScribanExpress.UnitTests
         [Fact]
         public void NamedStringProperty()
         {
-            var presonwrapper = new { person };
+            var personWrapper = new { person };
 
             var templateText = @"{{ person.FirstName }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(presonwrapper, template.Page.Body);
+            var result = AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
             var sb = new StringBuilder();
-            functor(sb, presonwrapper, null);
+            functor(sb, personWrapper, null);
 
             Assert.Equal("Billy", sb.ToString());
         }
@@ -225,7 +225,7 @@ namespace ScribanExpress.UnitTests
 
         public Expression<Action<StringBuilder,T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new ExpressionGenerator().Generate<T, object>(scriptBlockStatement);
+            return new StatementGenerator().Generate<T, object>(scriptBlockStatement);
         }
 
     }

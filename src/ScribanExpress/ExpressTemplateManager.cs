@@ -8,15 +8,16 @@ using System.Text;
 
 namespace ScribanExpress
 {
-    public class ExpressTemplateManager<L> : IExpressTemplateManager where L : FunctionLibary
+    public class ExpressTemplateManager<L> : IExpressTemplateManager where L : StandardLibrary
     {
         private readonly ConcurrentDictionary<string, object> functionary;
-        private readonly ExpressionGenerator expressionGenerator;
-        private readonly L functionLibrary;
-        public ExpressTemplateManager(L functionLibrary)
+        private readonly StatementGenerator statementGenerator;
+        private readonly L standardLibrary;
+
+        public ExpressTemplateManager(L standardLibrary)
         {
-            this.functionLibrary = functionLibrary;
-            expressionGenerator = new ExpressionGenerator();
+            this.standardLibrary = standardLibrary;
+            statementGenerator = new StatementGenerator();
             functionary = new ConcurrentDictionary<string, object>();
         }
         public string Render<T>(string templateText, T value)
@@ -24,20 +25,21 @@ namespace ScribanExpress
             return GetFunc<T>(templateText)(value);
         }
 
-
         private Func<T, string> GetFunc<T>(string templateText)
         {
-
             Func<string, object> Compiler = (_) =>
                 {
+                    var template = Template.Parse(templateText, null, null, null);
+                    var expression = statementGenerator.Generate<T, L>(template.Page.Body);
+                    var compiled = expression.Compile();
+                    return compiled;
 
                 };
 
             string cacheKey = typeof(T) + templateText;
             var compiledItem = functionary.GetOrAdd(cacheKey, Compiler);
 
-
-            return MapFunction(compiledItem as Action<StringBuilder, T, L>, functionLibrary);
+            return MapFunction(compiledItem as Action<StringBuilder, T, L>, standardLibrary);
         }
 
         private Func<T, string> MapFunction<T, Y>(Action<StringBuilder, T, Y> input, Y libary)

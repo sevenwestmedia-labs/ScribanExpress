@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ScribanExpress.Functions
 {
-    public class FunctionLibary
+    public class StandardLibrary
     {
-        public FunctionLibary()
+        public StandardLibrary()
         {
             Date = new DateTimeFunctions();
             String = new StringFunctions();

@@ -64,7 +64,7 @@ namespace ScribanExpress.Benchmarks.Comparison
                 products.Add(product);
             }
 
-            expressTemplateManager = new ExpressTemplateManager<FunctionLibary>(new FunctionLibary());
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
             scribanTemplate = Template.Parse(ScribanTemplateText);
             _razorTemplate = RazorBuilder.Compile(TestTemplateRazor);
         }
