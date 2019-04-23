@@ -1,4 +1,5 @@
-﻿using Scriban.Syntax;
+﻿using Microsoft.Extensions.Logging;
+using Scriban.Syntax;
 using ScribanExpress.Helpers;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,12 @@ namespace ScribanExpress
     public class StatementGenerator
     {
         private readonly ExpressionGenerator expressionGenerator;
-        public StatementGenerator()
+        private readonly ILogger<StatementGenerator> logger;
+
+        public StatementGenerator(ILogger<StatementGenerator> logger)
         {
             expressionGenerator = new ExpressionGenerator();
+            this.logger = logger;
         }
 
         public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
@@ -71,7 +75,14 @@ namespace ScribanExpress
                     List<Expression> statements = new List<Expression>();
                     foreach (var statement in scriptBlockStatement.Statements)
                     {
-                        statements.Add(GetStatementExpression(stringBuilderParameter, statement, parameterFinder));
+                        try
+                        {
+                            statements.Add(GetStatementExpression(stringBuilderParameter, statement, parameterFinder));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Statement Failed to build: {statement}", statement);
+                        }
                     }
                     var blockExpression = Expression.Block(statements);
                     return blockExpression;

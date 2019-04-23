@@ -26,30 +26,30 @@ namespace ScribanExpress
 
         public Expression GetExpressionBody(ScriptExpression scriptExpression, ParameterFinder parameterFinder, List<Expression> arguments)
         {
-            Expression currentExpression = null;
             switch (scriptExpression)
             {
                 case ScriptVariableGlobal scriptVariableGlobal:
                    var variable = parameterFinder.GetProperty(scriptVariableGlobal.Name);
-                   currentExpression = variable;
-                   break;
+                    if (variable == null)
+                    {
+                        throw new KeyNotFoundException("Variable Not Found");
+                    }
+                   return variable;
 
                 case ScriptLiteral scriptLiteral:
-                    currentExpression = Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());
-                    break;
+                    return Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());
 
                 case ScriptUnaryExpression scriptUnaryExpression:
                     switch (scriptUnaryExpression.Operator)
                     {
                         case ScriptUnaryOperator.Not:
                             var right = GetExpressionBody(scriptUnaryExpression.Right, parameterFinder, arguments);
-                            currentExpression = Expression.Not(right);
-                            break;
+                            return Expression.Not(right);
+                            
                         default:
                             throw new NotImplementedException("Unknown ScriptUnaryOperator");
                     }
 
-                    break;
                 case ScriptMemberExpression scriptMemberExpression:
                     // it's impossible to tell if we have a member or a method, so we check for both
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
@@ -57,7 +57,7 @@ namespace ScribanExpress
                     var property = ExpressionHelpers.GetProperty(memberTarget.Type, memberName);
                     if (property != null)
                     {
-                        currentExpression = Expression.Property(memberTarget, memberName);
+                        return Expression.Property(memberTarget, memberName);
                     }
 
 
@@ -68,10 +68,10 @@ namespace ScribanExpress
 
                     if (methodInfo != null)
                     {
-                        currentExpression = ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
+                        return ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
                     }
 
-                    break;
+                    throw new KeyNotFoundException("Member Not Found");
 
                 case ScriptPipeCall scriptPipeCall:
                     // I'm not a huge fan of this because it requires pushing args down to sub nodes, could cause issues with multi funtions tree
@@ -83,31 +83,25 @@ namespace ScribanExpress
                     {
                         case ScriptFunctionCall scriptFunctionCall:
                             pipelineArgs.AddRange(scriptFunctionCall.Arguments.Select(arg => GetExpressionBody(arg, parameterFinder, null)));
-                            currentExpression = GetExpressionBody(scriptFunctionCall.Target, parameterFinder, pipelineArgs);
-                            break;
+                            return GetExpressionBody(scriptFunctionCall.Target, parameterFinder, pipelineArgs);
                         case ScriptMemberExpression scriptMemberExpression:
-                            currentExpression = GetExpressionBody(scriptMemberExpression, parameterFinder, pipelineArgs);
-                            break;
+                            return GetExpressionBody(scriptMemberExpression, parameterFinder, pipelineArgs);
                         case ScriptPipeCall toScriptPipeCall:
                             var nestedfromExpression = GetExpressionBody(toScriptPipeCall.From, parameterFinder, pipelineArgs);
-                            currentExpression = GetExpressionBody(toScriptPipeCall.To, parameterFinder, new List<Expression> { nestedfromExpression });
-                            break;
-
-                            // todo break on default
+                            return GetExpressionBody(toScriptPipeCall.To, parameterFinder, new List<Expression> { nestedfromExpression });
+                        default:
+                            throw new NotSupportedException("Pipeline Expression Not Supported");
                     }
 
-                    break;
+                    
                 case ScriptFunctionCall scriptFunctionCall:
-                    currentExpression = CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
-                    break;
+                    return CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
+                    
                 case ScriptNestedExpression scriptNestedExpression:
-                    currentExpression = GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
-                    break;
+                   return GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
                 default:
                     throw new NotImplementedException($"Unknown Expression Type");
             }
-
-            return currentExpression;
         }
 
         public Expression CalculateScriptFunctionCall(ScriptFunctionCall scriptFunctionCall, ParameterFinder parameterFinder, List<Expression> arguments)

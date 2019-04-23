@@ -1,6 +1,8 @@
-﻿using Scriban;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Scriban;
 using Scriban.Syntax;
 using ScribanExpress.Functions;
+using ScribanExpress.UnitTests.Helpers;
 using ScribanExpress.UnitTests.Models;
 using Shouldly;
 using System;
@@ -79,7 +81,7 @@ namespace ScribanExpress.UnitTests
 
         public Expression<Action<StringBuilder,T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new StatementGenerator().Generate<T, RootLibary>(scriptBlockStatement);
+            return Factory.CreateStatementGenerator().Generate<T, RootLibary>(scriptBlockStatement);
         }
     }
 }

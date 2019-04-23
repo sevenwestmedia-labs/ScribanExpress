@@ -16,11 +16,11 @@ namespace ScribanExpress
         private readonly ILogger<ExpressTemplateManager<L>> logger;
         private readonly L standardLibrary;
 
-        public ExpressTemplateManager(ILogger<ExpressTemplateManager<L>> logger, L standardLibrary)
+        public ExpressTemplateManager(ILogger<ExpressTemplateManager<L>> logger, L standardLibrary, StatementGenerator statementGenerator)
         {
             this.logger = logger;
             this.standardLibrary = standardLibrary;
-            statementGenerator = new StatementGenerator();
+            this.statementGenerator = statementGenerator;
             functionary = new ConcurrentDictionary<string, object>();
         }
         public string Render<T>(string templateText, T value)
