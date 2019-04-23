@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Microsoft.Extensions.Logging.Abstractions;
 using Scriban;
 using ScribanExpress.Abstractions;
 using ScribanExpress.Benchmarks.Comparison.ThirdParty.Razor;
@@ -41,7 +42,7 @@ namespace ScribanExpress.Benchmarks
         public RenderManyBlocksBenchmarks()
         {
             templateText = "Hello {{name}} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }}";
-            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new NullLogger<ExpressTemplateManager<StandardLibrary>>(), new StandardLibrary());
             scribanTemplate = Template.Parse(templateText);
             _razorTemplate = RazorBuilder.Compile(@"Hello @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name");
         }

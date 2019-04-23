@@ -29,7 +29,7 @@ dotnet build
 
  ## MVP
 
- * Demo
+ 
  * Handle Errors { expression, errors}
 	Plan:	if a stament breaks, just log and skip
 			How do we make it obvious that a particluar template has broken statements,? metrics?
@@ -41,11 +41,10 @@ dotnet build
 			if scriban breaks? 
 				what are our options? should we return a default or throw
  * renamer
- * cache on input type(s)
- * allow custom Types
  * list functions
 
  ## TODO
+
  * Add basic logging, e.g log template parse
  * Allow convertion in functions, e.g pass into double
  * correct folder structure
@@ -53,3 +52,7 @@ dotnet build
  * ci/cd
  * named variables
  * documentation
+
+## Future
+* consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance
+* Post benchmarks to a datasource

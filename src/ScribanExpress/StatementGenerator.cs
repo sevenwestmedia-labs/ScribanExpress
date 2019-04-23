@@ -26,7 +26,7 @@ namespace ScribanExpress
             parameterFinder.AddType(InputParameter);
 
             var blockExpression = GetStatementExpression(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
-            
+
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
@@ -79,15 +79,17 @@ namespace ScribanExpress
                 case ScriptForStatement scriptForStatement:
                     // foreach(item in items)
                     var itemsExpression = expressionGenerator.GetExpressionBody(scriptForStatement.Iterator, parameterFinder, null);
-                    var itemVaribleName = (scriptForStatement.Variable as ScriptVariableGlobal).Name;
+                    var itemVariableName = (scriptForStatement.Variable as ScriptVariableGlobal).Name;
                     var itemType = itemsExpression.Type.GenericTypeArguments[0];
-                    ParameterExpression itemVariable = Expression.Parameter(itemType, itemVaribleName);
+                    ParameterExpression itemVariable = Expression.Parameter(itemType, itemVariableName);
 
-                    parameterFinder = parameterFinder.CreateScope();
-                    parameterFinder.AddLocalVariable(itemVariable);
-                    var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, parameterFinder);
-                    var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
-                    return foreachExpression;
+                    using (var scopedParameterFinder = parameterFinder.CreateScope())
+                    {
+                        scopedParameterFinder.AddLocalVariable(itemVariable);
+                        var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, scopedParameterFinder);
+                        var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
+                        return foreachExpression;
+                    }
 
                 default:
                     throw new NotImplementedException("Unknown ScriptStatement");

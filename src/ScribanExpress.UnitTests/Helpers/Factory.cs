@@ -1,4 +1,5 @@
-﻿using ScribanExpress.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using ScribanExpress.Abstractions;
 using ScribanExpress.Functions;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace ScribanExpress.UnitTests.Helpers
     {
         public static IExpressTemplateManager CreateExpressTemplateManager()
         {
-            return new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
+            return new ExpressTemplateManager<StandardLibrary>(new NullLogger<ExpressTemplateManager<StandardLibrary>>(), new StandardLibrary());
         }
         
     }
