@@ -1,4 +1,6 @@
-﻿using Shouldly;
+﻿using ScribanExpress.Abstractions;
+using ScribanExpress.UnitTests.Helpers;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +14,7 @@ namespace ScribanExpress.UnitTests.Functions
         [InlineData(@"{{ (TimeSpan.fromdays 5).days }}", "5")]
         public void Function_Tests(string templateText, string resultText)
         {
-            ExpressTemplateManager expressTemplateManager = new ExpressTemplateManager();
+            IExpressTemplateManager expressTemplateManager = Factory.CreateExpressTemplateManager();
             var result = expressTemplateManager.Render(templateText, new { });
 
             result.ShouldBe(resultText);

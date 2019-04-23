@@ -16,7 +16,7 @@ namespace ScribanExpress.UnitTests
             var x = new { Name="someName" };
             finder.AddType(Expression.Parameter(x.GetType()));
 
-            var result = finder.Find("Name");
+            var result = finder.GetProperty("Name");
 
             result.ShouldNotBeNull();
         }
@@ -28,7 +28,7 @@ namespace ScribanExpress.UnitTests
             var x = new { Name = "someName" };
             finder.AddType(Expression.Parameter(x.GetType()));
 
-            var result = finder.Find("naMe");
+            var result = finder.GetProperty("naMe");
 
             result.ShouldNotBeNull();
         }

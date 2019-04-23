@@ -2,6 +2,7 @@
 using Scriban.Syntax;
 using ScribanExpress.Functions;
 using ScribanExpress.UnitTests.Models;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -43,7 +44,7 @@ namespace ScribanExpress.UnitTests
             var sb = new StringBuilder();
             functor(sb, presonwrapper, new RootLibary());
 
-            Assert.Equal(resultText, sb.ToString());
+            sb.ToString().ShouldBe(resultText, reason);
         }
 
 
@@ -78,7 +79,7 @@ namespace ScribanExpress.UnitTests
 
         public Expression<Action<StringBuilder,T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new ExpressionGenerator().Generate<T, RootLibary>(scriptBlockStatement);
+            return new StatementGenerator().Generate<T, RootLibary>(scriptBlockStatement);
         }
     }
 }

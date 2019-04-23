@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribanExpress.Demo", "ScribanExpress.Demo\ScribanExpress.Demo.csproj", "{72A141B2-F485-4A54-8024-A8955C0E1608}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7EFCB15-B72E-40AA-8F96-6F4F4D607A1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72A141B2-F485-4A54-8024-A8955C0E1608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72A141B2-F485-4A54-8024-A8955C0E1608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72A141B2-F485-4A54-8024-A8955C0E1608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72A141B2-F485-4A54-8024-A8955C0E1608}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

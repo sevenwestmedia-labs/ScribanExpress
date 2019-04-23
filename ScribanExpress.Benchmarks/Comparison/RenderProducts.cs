@@ -1,7 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Scriban;
+using ScribanExpress.Abstractions;
 using ScribanExpress.Benchmarks.Comparison.ThirdParty.Razor;
 using ScribanExpress.Benchmarks.Models;
+using ScribanExpress.Functions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -21,7 +23,7 @@ namespace ScribanExpress.Benchmarks.Comparison
 
         private readonly List<Product> products;
 
-        private readonly ExpressTemplateManager expressTemplateManager;
+        private readonly IExpressTemplateManager expressTemplateManager;
         private readonly Template scribanTemplate;
         private readonly RazorTemplatePage _razorTemplate;
 
@@ -62,7 +64,7 @@ namespace ScribanExpress.Benchmarks.Comparison
                 products.Add(product);
             }
 
-            expressTemplateManager = new ExpressTemplateManager();
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
             scribanTemplate = Template.Parse(ScribanTemplateText);
             _razorTemplate = RazorBuilder.Compile(TestTemplateRazor);
         }
