@@ -8,14 +8,14 @@ using System.Text;
 
 namespace ScribanExpress
 {
-    public class ExpressTemplateManager: IExpressTemplateManager
+    public class ExpressTemplateManager<L> : IExpressTemplateManager where L : FunctionLibary
     {
-        private readonly IDictionary<string, object> functionary;
+        private readonly ConcurrentDictionary<string, object> functionary;
         private readonly ExpressionGenerator expressionGenerator;
-        private readonly FunctionLibary functionLibary;
-        public ExpressTemplateManager()
+        private readonly L functionLibrary;
+        public ExpressTemplateManager(L functionLibrary)
         {
-            functionLibary = new FunctionLibary();
+            this.functionLibrary = functionLibrary;
             expressionGenerator = new ExpressionGenerator();
             functionary = new ConcurrentDictionary<string, object>();
         }
@@ -27,22 +27,23 @@ namespace ScribanExpress
 
         private Func<T, string> GetFunc<T>(string templateText)
         {
-            if (!functionary.ContainsKey(templateText))
-            {
-                var template = Template.Parse(templateText, null, null, null);
-                var expression = expressionGenerator.Generate<T, FunctionLibary>(template.Page.Body);
-                var compiled =  expression.Compile();
 
-                functionary.Add(templateText, compiled);
-            }
+            Func<string, object> Compiler = (_) =>
+                {
 
-            return MapFunction(functionary[templateText] as Action<StringBuilder,T, FunctionLibary>, functionLibary);
+                };
+
+            string cacheKey = typeof(T) + templateText;
+            var compiledItem = functionary.GetOrAdd(cacheKey, Compiler);
+
+
+            return MapFunction(compiledItem as Action<StringBuilder, T, L>, functionLibrary);
         }
 
-
-        private Func<T, string> MapFunction<T,Y>(Action<StringBuilder,T,Y> input, Y libary)
+        private Func<T, string> MapFunction<T, Y>(Action<StringBuilder, T, Y> input, Y libary)
         {
-            Func<T, string> returnFunc = x => {
+            Func<T, string> returnFunc = x =>
+            {
                 StringBuilder sb = new StringBuilder();
                 //try catch here? or per statement?
                 input(sb, x, libary);

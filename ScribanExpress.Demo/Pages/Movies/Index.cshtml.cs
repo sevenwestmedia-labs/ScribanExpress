@@ -13,7 +13,13 @@ namespace ScribanExpress.Demo.Pages.Movies
         public void OnGet()
         {
             Examples = new List<string>() {
-              "{{ movie.Title | string.truncate 10 }} </br> {{ movie.Title.tolower | string.capitalize }}"
+              "{{ movie.Title }}",
+              "{{ movie.Title | string.truncate 10 }}",
+              "{{ movie.Title.tolower | string.capitalize }}",
+              "{{ movie.Title | string.truncate 10 }} </br> {{ movie.Title.tolower | string.capitalize }}",
+              "{{ if movie.IsFeatured }}Featured: {{ end }}{{ movie.Title }}",
+              @"{{ movie.Genres | array.join "",""   }}",
+              "{{ movie | debug.ShowProperties }}"
             };
 
         

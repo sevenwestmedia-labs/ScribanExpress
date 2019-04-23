@@ -13,8 +13,9 @@ namespace ScribanExpress.Demo.Models
 
         [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
-        public string Genre { get; set; }
+        public List<string> Genres { get; set; }
         public decimal Price { get; set; }
+        public bool IsFeatured { get; set; }
 
         public string TallImageUrl { get; set; }
     }

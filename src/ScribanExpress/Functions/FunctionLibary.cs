@@ -12,6 +12,7 @@ namespace ScribanExpress.Functions
             Date = new DateTimeFunctions();
             String = new StringFunctions();
             TimeSpan = new TimeSpanFunctions();
+            Array = new ArrayFunctions();
         }
 
         public DateTimeFunctions Date { get; }
@@ -19,5 +20,6 @@ namespace ScribanExpress.Functions
         public StringFunctions String { get; }
 
         public TimeSpanFunctions TimeSpan { get; }
+        public ArrayFunctions Array { get; }
     }
 }

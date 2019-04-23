@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ScribanExpress.AspNetCore.Extensions;
+using ScribanExpress.Demo.CustomFunction;
 
 namespace ScribanExpress.Demo
 {
@@ -32,8 +33,11 @@ namespace ScribanExpress.Demo
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            // Use this for standard Library
+            //services.AddScribanExpress();
 
-            services.AddScribanExpress();
+            //Add Type if you need to add custom functions
+            services.AddScribanExpress<CustomLibrary>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

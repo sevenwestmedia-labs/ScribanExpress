@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Scriban;
+using ScribanExpress.Abstractions;
 using ScribanExpress.Benchmarks.Comparison.ThirdParty.Razor;
+using ScribanExpress.Functions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -31,7 +33,7 @@ namespace ScribanExpress.Benchmarks
         | ScribanRenderManyBlocks | 62.657 us | 0.8923 us | 0.8346 us |  1.00 |
         */
 
-        private readonly ExpressTemplateManager expressTemplateManager;
+        private readonly IExpressTemplateManager expressTemplateManager;
         private readonly Template scribanTemplate;
         private readonly RazorTemplatePage _razorTemplate;
         private readonly string templateText;
@@ -39,7 +41,7 @@ namespace ScribanExpress.Benchmarks
         public RenderManyBlocksBenchmarks()
         {
             templateText = "Hello {{name}} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }} blah {{ name }}";
-            expressTemplateManager = new ExpressTemplateManager();
+            expressTemplateManager = new ExpressTemplateManager<FunctionLibary>(new FunctionLibary());
             scribanTemplate = Template.Parse(templateText);
             _razorTemplate = RazorBuilder.Compile(@"Hello @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name blah @Model.Name");
         }

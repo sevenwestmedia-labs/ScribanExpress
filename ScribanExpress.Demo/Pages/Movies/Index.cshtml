@@ -5,19 +5,7 @@
 }
 
 <h1>Index</h1>
-<div>
 
-</div>
-<div>
-    <h4>Examples</h4>
-    @foreach (var example in @Model.Examples)
-{
-    <div>
-        <p></p>
-        <blockquote name="example">@example</blockquote>
-    </div>
-}
-</div>
 
 <div class="alert alert-primary">
     <label for="titleTemplate">Title:</label> <input id="titleTemplate" name="titleTemplate-input" value="asdfsd" autofocus class="form-control" />
@@ -27,6 +15,18 @@
     <h6>Cards</h6>
     <div id="cardPlaceholder" class="card-columns"></div>
 </div>
+
+<div>
+    <h4>Examples</h4>
+    @foreach (var example in @Model.Examples)
+    {
+    <div>
+        <p></p>
+        <blockquote name="example">@example</blockquote>
+    </div>
+    }
+</div>
+
 
 <script>
     const titleTemplateElement = document.querySelector('input[name="titleTemplate-input"]');

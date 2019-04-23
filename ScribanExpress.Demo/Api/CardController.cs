@@ -25,15 +25,22 @@ namespace ScribanExpress.Demo.Api
             var movies = new List<Movie> {
                 new Movie {
                     Title = "Pet Cemetary",
-                    TallImageUrl = "https://m.media-amazon.com/images/M/MV5BMTU2NDIyMDQ1Ml5BMl5BanBnXkFtZTgwNjI2OTA5NzM@._V1_SY298_SX201_AL_.jpg"
+                    TallImageUrl = "https://m.media-amazon.com/images/M/MV5BMTU2NDIyMDQ1Ml5BMl5BanBnXkFtZTgwNjI2OTA5NzM@._V1_SY298_SX201_AL_.jpg",
+                    Price = 17.50M,
+                    IsFeatured = true,
+                    Genres = new List<string> { "horror", "pets" }
+                    
                 },
                 new Movie {
                     Title = "RAmy" ,
-                    TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTA3NzAzNDg2NzBeQTJeQWpwZ15BbWU4MDYzNjkwOTcz._V1_SY298_SX201_AL_.jpg"
+                    TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTA3NzAzNDg2NzBeQTJeQWpwZ15BbWU4MDYzNjkwOTcz._V1_SY298_SX201_AL_.jpg",
+                    Price = 127.50M,
+                    Genres = new List<string> { "potaot" }
                 },
                 new Movie {
                     Title = "asdasdf" ,
-                    TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTg3ODcxNjAzMl5BMl5BanBnXkFtZTgwODM2OTA5NzM@._V1_SY298_SX201_AL_.jpg"
+                    TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTg3ODcxNjAzMl5BMl5BanBnXkFtZTgwODM2OTA5NzM@._V1_SY298_SX201_AL_.jpg",
+                    Genres = new List<string> { "horrored" }
                 }
             };
 
