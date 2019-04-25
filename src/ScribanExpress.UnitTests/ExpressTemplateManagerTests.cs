@@ -21,5 +21,24 @@ namespace ScribanExpress.UnitTests
             resultNumber.ShouldBe("5");
             resultstring.ShouldBe("6");
         }
+        [Fact]
+        public void InvalidTemplate_EmptyStringReturned()
+        {
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+
+            var resultNumber = expressTemplateManager.Render("{{ ssabc }}", new { abc = 5 });
+            
+            resultNumber.ShouldBe(string.Empty);
+        }
+
+        [Fact]
+        public void InvalidStatement_ReturnsPartialSatement()
+        {
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+
+            var resultNumber = expressTemplateManager.Render("hello{{ ssabc }}", new { abc = 5 });
+
+            resultNumber.ShouldBe("hello");
+        }
     }
 }

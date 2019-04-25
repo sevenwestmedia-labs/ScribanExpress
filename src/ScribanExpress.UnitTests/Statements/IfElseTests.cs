@@ -1,5 +1,7 @@
-﻿using Scriban;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Scriban;
 using Scriban.Syntax;
+using ScribanExpress.UnitTests.Helpers;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -64,6 +66,7 @@ namespace ScribanExpress.UnitTests
             functor(sb, presonwrapper, null);
             sb.ToString().ShouldBe("value is false");
         }
+
 
         [Fact]
         public void ElseIf()
@@ -134,7 +137,7 @@ namespace ScribanExpress.UnitTests
         }
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new StatementGenerator().Generate<T, object>(scriptBlockStatement);
+            return Factory.CreateStatementGenerator().Generate<T, object>(scriptBlockStatement);
         }
     }
 }

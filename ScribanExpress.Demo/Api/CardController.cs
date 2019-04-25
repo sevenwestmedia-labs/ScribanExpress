@@ -28,19 +28,19 @@ namespace ScribanExpress.Demo.Api
                     TallImageUrl = "https://m.media-amazon.com/images/M/MV5BMTU2NDIyMDQ1Ml5BMl5BanBnXkFtZTgwNjI2OTA5NzM@._V1_SY298_SX201_AL_.jpg",
                     Price = 17.50M,
                     IsFeatured = true,
-                    Genres = new List<string> { "horror", "pets" }
-                    
+                    Genres = new List<string> { "horror", "pets" },
                 },
                 new Movie {
                     Title = "RAmy" ,
                     TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTA3NzAzNDg2NzBeQTJeQWpwZ15BbWU4MDYzNjkwOTcz._V1_SY298_SX201_AL_.jpg",
                     Price = 127.50M,
-                    Genres = new List<string> { "potaot" }
+                    Genres = new List<string> { "comedy" }
+                    
                 },
                 new Movie {
-                    Title = "asdasdf" ,
+                    Title = "Piranna" ,
                     TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTg3ODcxNjAzMl5BMl5BanBnXkFtZTgwODM2OTA5NzM@._V1_SY298_SX201_AL_.jpg",
-                    Genres = new List<string> { "horrored" }
+                    Genres = new List<string> { "dwama" },
                 }
             };
 

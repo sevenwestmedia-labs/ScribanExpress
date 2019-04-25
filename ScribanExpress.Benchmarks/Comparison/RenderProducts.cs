@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Microsoft.Extensions.Logging.Abstractions;
 using Scriban;
 using ScribanExpress.Abstractions;
 using ScribanExpress.Benchmarks.Comparison.ThirdParty.Razor;
@@ -64,7 +65,7 @@ namespace ScribanExpress.Benchmarks.Comparison
                 products.Add(product);
             }
 
-            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new StandardLibrary());
+            expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new NullLogger<ExpressTemplateManager<StandardLibrary>>(),new StandardLibrary(), new StatementGenerator(new NullLogger<StatementGenerator>()));
             scribanTemplate = Template.Parse(ScribanTemplateText);
             _razorTemplate = RazorBuilder.Compile(TestTemplateRazor);
         }

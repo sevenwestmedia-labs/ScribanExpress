@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Syntax;
@@ -30,7 +31,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"This is a World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new StatementGenerator().Generate<string, object>(template.Page.Body);
+            var result = new StatementGenerator(new NullLogger<StatementGenerator>()).Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -40,20 +41,6 @@ namespace ScribanExpress.UnitTests
         }
 
 
-        [Fact]
-        public void MultiRawScriptHelloWorld()
-        {
-            ScriptBlockStatement scriptBlockStatement = new ScriptBlockStatement();
-            scriptBlockStatement.Statements.Add(ScriptRawStatementHelper.CreateScriptRawStatement("first"));
-            scriptBlockStatement.Statements.Add(ScriptRawStatementHelper.CreateScriptRawStatement("second"));
-
-            var result = new StatementGenerator().Generate<string, object>(scriptBlockStatement);
-            var sb = new StringBuilder();
-            var functor = result.Compile();
-            functor(sb, "saasdf", null);
-            Assert.Equal("firstsecond", sb.ToString() );
-        }
-
 
         [Fact]
         public void StringProperty()
@@ -61,7 +48,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"This is a {{ Length }} World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new StatementGenerator().Generate<string, object>(template.Page.Body);
+            var result = new StatementGenerator(new NullLogger<StatementGenerator>()).Generate<string, object>(template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -225,7 +212,7 @@ namespace ScribanExpress.UnitTests
 
         public Expression<Action<StringBuilder,T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return new StatementGenerator().Generate<T, object>(scriptBlockStatement);
+            return Factory.CreateStatementGenerator().Generate<T, object>(scriptBlockStatement);
         }
 
     }

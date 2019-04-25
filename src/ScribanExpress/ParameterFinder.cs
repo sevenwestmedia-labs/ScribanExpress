@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ScribanExpress
 {
-    public class ParameterFinder
+    public class ParameterFinder : IDisposable  
     {
         private readonly ParameterFinder parentFinder;
         private readonly Stack<ParameterExpression> parameterStack;
@@ -32,7 +32,14 @@ namespace ScribanExpress
             }
             else {
                 var globalParam = FindGlobalObject(propertyName);
-                return Expression.Property(globalParam, propertyName);
+                if (globalParam != null)
+                {
+                    return Expression.Property(globalParam, propertyName);
+                }
+                else
+                {
+                    return FindRootObject(propertyName);
+                }
             }
         }
 
@@ -68,6 +75,24 @@ namespace ScribanExpress
             {
                 return parentFinder.FindGlobalObject(propertyName);
             }
+
+            return null;
+        }
+
+        public ParameterExpression FindRootObject(string propertyName)
+        {
+            foreach (var parameterExpression in parameterStack)
+            {
+                if (parameterExpression.Name == propertyName)
+                {
+                    return parameterExpression;
+                }
+            }
+
+            if (parentFinder != null)
+            {
+                return parentFinder.FindRootObject(propertyName);
+            }
             return null;
         }
 
@@ -85,5 +110,41 @@ namespace ScribanExpress
         {
             return new ParameterFinder(this);
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~ParameterFinder()
+        // {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

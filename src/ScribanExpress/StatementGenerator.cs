@@ -1,4 +1,5 @@
-﻿using Scriban.Syntax;
+﻿using Microsoft.Extensions.Logging;
+using Scriban.Syntax;
 using ScribanExpress.Helpers;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,12 @@ namespace ScribanExpress
     public class StatementGenerator
     {
         private readonly ExpressionGenerator expressionGenerator;
-        public StatementGenerator()
+        private readonly ILogger<StatementGenerator> logger;
+
+        public StatementGenerator(ILogger<StatementGenerator> logger)
         {
             expressionGenerator = new ExpressionGenerator();
+            this.logger = logger;
         }
 
         public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
@@ -26,7 +30,7 @@ namespace ScribanExpress
             parameterFinder.AddType(InputParameter);
 
             var blockExpression = GetStatementExpression(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
-            
+
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
@@ -71,7 +75,14 @@ namespace ScribanExpress
                     List<Expression> statements = new List<Expression>();
                     foreach (var statement in scriptBlockStatement.Statements)
                     {
-                        statements.Add(GetStatementExpression(stringBuilderParameter, statement, parameterFinder));
+                        try
+                        {
+                            statements.Add(GetStatementExpression(stringBuilderParameter, statement, parameterFinder));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Statement Failed to build: {statement}", statement);
+                        }
                     }
                     var blockExpression = Expression.Block(statements);
                     return blockExpression;
@@ -79,15 +90,17 @@ namespace ScribanExpress
                 case ScriptForStatement scriptForStatement:
                     // foreach(item in items)
                     var itemsExpression = expressionGenerator.GetExpressionBody(scriptForStatement.Iterator, parameterFinder, null);
-                    var itemVaribleName = (scriptForStatement.Variable as ScriptVariableGlobal).Name;
+                    var itemVariableName = (scriptForStatement.Variable as ScriptVariableGlobal).Name;
                     var itemType = itemsExpression.Type.GenericTypeArguments[0];
-                    ParameterExpression itemVariable = Expression.Parameter(itemType, itemVaribleName);
+                    ParameterExpression itemVariable = Expression.Parameter(itemType, itemVariableName);
 
-                    parameterFinder = parameterFinder.CreateScope();
-                    parameterFinder.AddLocalVariable(itemVariable);
-                    var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, parameterFinder);
-                    var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
-                    return foreachExpression;
+                    using (var scopedParameterFinder = parameterFinder.CreateScope())
+                    {
+                        scopedParameterFinder.AddLocalVariable(itemVariable);
+                        var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, scopedParameterFinder);
+                        var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
+                        return foreachExpression;
+                    }
 
                 default:
                     throw new NotImplementedException("Unknown ScriptStatement");
