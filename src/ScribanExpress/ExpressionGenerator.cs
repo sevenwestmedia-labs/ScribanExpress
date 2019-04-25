@@ -11,8 +11,11 @@ namespace ScribanExpress
 {
     public class ExpressionGenerator
     {
+        private readonly MemberFinder memberFinder;
+
         public ExpressionGenerator()
         {
+            memberFinder = new MemberFinder();
         }
 
 
@@ -29,12 +32,12 @@ namespace ScribanExpress
             switch (scriptExpression)
             {
                 case ScriptVariableGlobal scriptVariableGlobal:
-                   var variable = parameterFinder.GetProperty(scriptVariableGlobal.Name);
+                    var variable = parameterFinder.GetProperty(scriptVariableGlobal.Name);
                     if (variable == null)
                     {
                         throw new KeyNotFoundException("Variable Not Found");
                     }
-                   return variable;
+                    return variable;
 
                 case ScriptLiteral scriptLiteral:
                     return Expression.Constant(scriptLiteral.Value, scriptLiteral.Value.GetType());
@@ -71,6 +74,12 @@ namespace ScribanExpress
                         return ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
                     }
 
+
+                    methodInfo = memberFinder.FindMember(memberTarget.Type, memberName, argumentTypeList) as MethodInfo;
+                    if (methodInfo != null)
+                    {
+                        return ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
+                    }
                     throw new KeyNotFoundException("Member Not Found");
 
                 case ScriptPipeCall scriptPipeCall:
@@ -93,12 +102,13 @@ namespace ScribanExpress
                             throw new NotSupportedException("Pipeline Expression Not Supported");
                     }
 
-                    
+
                 case ScriptFunctionCall scriptFunctionCall:
                     return CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
-                    
+
                 case ScriptNestedExpression scriptNestedExpression:
-                   return GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
+                    return GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
+
                 default:
                     throw new NotImplementedException($"Unknown Expression Type");
             }
@@ -124,10 +134,10 @@ namespace ScribanExpress
                 var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
                 var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
                 var functionName = toMember.Member;
-                var methodInfo = ExpressionHelpers.GetMethod(targetType.Type, functionName.Name, argumentTypes.ToArray());
-                return ExpressionHelpers.CallMethod(methodInfo, targetType, args);
+                var methodInfo = memberFinder.FindMember(targetType.Type, functionName.Name, argumentTypes.ToArray());
+                return ExpressionHelpers.CallMember(targetType, methodInfo, args);
             }
         }
-    
+
     }
 }

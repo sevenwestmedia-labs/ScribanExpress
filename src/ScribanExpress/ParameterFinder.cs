@@ -32,7 +32,14 @@ namespace ScribanExpress
             }
             else {
                 var globalParam = FindGlobalObject(propertyName);
-                return Expression.Property(globalParam, propertyName);
+                if (globalParam != null)
+                {
+                    return Expression.Property(globalParam, propertyName);
+                }
+                else
+                {
+                    return FindRootObject(propertyName);
+                }
             }
         }
 
@@ -67,6 +74,24 @@ namespace ScribanExpress
             if (parentFinder != null)
             {
                 return parentFinder.FindGlobalObject(propertyName);
+            }
+
+            return null;
+        }
+
+        public ParameterExpression FindRootObject(string propertyName)
+        {
+            foreach (var parameterExpression in parameterStack)
+            {
+                if (parameterExpression.Name == propertyName)
+                {
+                    return parameterExpression;
+                }
+            }
+
+            if (parentFinder != null)
+            {
+                return parentFinder.FindRootObject(propertyName);
             }
             return null;
         }

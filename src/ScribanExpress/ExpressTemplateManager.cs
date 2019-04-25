@@ -30,7 +30,7 @@ namespace ScribanExpress
 
         private Func<T, string> GetFunc<T>(string templateText)
         {
-            Func<string, object> Compiler = (_) =>
+            Func<string, object> Compiler = _ =>
                 {
                     try
                     {

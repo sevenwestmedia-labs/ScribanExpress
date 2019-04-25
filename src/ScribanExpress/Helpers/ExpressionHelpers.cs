@@ -12,11 +12,12 @@ namespace ScribanExpress.Helpers
         public static PropertyInfo GetProperty(Type type, string memberName)
         {
             return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance  | BindingFlags.Public);
+            return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
         }
 
         public static MethodInfo GetMethod(Type type, string methodName, IEnumerable<Type> argumentTypes)
         {
-            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, null, argumentTypes?.ToArray(), null);
+            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, null, (argumentTypes ?? Enumerable.Empty<Type>()).ToArray(), null);
         }
 
         public static MethodCallExpression CallMethod(MethodInfo methodInfo, Expression targetObject, IEnumerable<Expression> arguments)
@@ -31,6 +32,20 @@ namespace ScribanExpress.Helpers
             }
         }
 
+        public static Expression CallMember(Expression instance, MemberInfo memberInfo, IEnumerable<Expression> arguments)
+        {
+
+            switch (memberInfo)
+            {
+                case PropertyInfo propertyInfo:
+                    return Expression.Property(instance, propertyInfo);
+                case MethodInfo methodInfo:
+                    return  ExpressionHelpers.CallMethod(methodInfo, instance, arguments);
+                default:
+                    throw new NotSupportedException(); 
+            }
+
+        }
         // https://stackoverflow.com/questions/27175558/foreach-loop-using-expression-trees
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
