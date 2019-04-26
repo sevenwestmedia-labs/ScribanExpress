@@ -135,6 +135,7 @@ namespace ScribanExpress.UnitTests
 
             sb.ToString().ShouldBe("someValue is true.someOtherValue is false");
         }
+
         public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
             return Factory.CreateStatementGenerator().Generate<T, object>(scriptBlockStatement);

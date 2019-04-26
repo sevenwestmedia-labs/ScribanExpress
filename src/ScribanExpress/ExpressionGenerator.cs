@@ -106,6 +106,8 @@ namespace ScribanExpress
                             return Expression.Add(leftExpression, rightExpression);
                         case ScriptBinaryOperator.EmptyCoalescing:
                             return Expression.Coalesce(leftExpression, rightExpression);
+                        case ScriptBinaryOperator.CompareEqual:
+                            return Expression.Equal(leftExpression, rightExpression);
                         default:
                             throw new NotImplementedException("Unknown ScriptBinaryExpression Operator");
                     }

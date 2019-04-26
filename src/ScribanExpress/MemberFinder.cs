@@ -20,13 +20,13 @@ namespace ScribanExpress
 
         private MemberInfo FindMemberInfo(Type type, string memberName, IEnumerable<Type> arguments)
         {
-            var property = ExpressionHelpers.GetProperty(type, memberName);
+            var property = ReflectionHelpers.GetProperty(type, memberName);
             if (property != null)
             {
                 return property;
             }
             
-            var methodInfo = ExpressionHelpers.GetMethod(type, memberName, arguments);
+            var methodInfo = ReflectionHelpers.GetMethod(type, memberName, arguments);
             if (methodInfo != null)
             {
                 return methodInfo;

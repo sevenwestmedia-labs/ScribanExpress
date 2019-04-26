@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 
 namespace ScribanExpress
@@ -64,7 +63,7 @@ namespace ScribanExpress
         {
             foreach (var parameterExpression in parameterStack)
             {
-                var propertyExists = ExpressionHelpers.GetProperty(parameterExpression.Type, propertyName) != null;
+                var propertyExists = ReflectionHelpers.GetProperty(parameterExpression.Type, propertyName) != null;
                 if (propertyExists)
                 {
                     return parameterExpression;

@@ -6,6 +6,7 @@
 * At this point Security has not been considered, templates should be controlled by trusted individuals
 
 
+
 ## Build and Test
 
 ### Build
@@ -51,6 +52,8 @@ dotnet build
  * ci/cd
  * named variables
  * documentation
+ * add scriban default library
+ * look into truthy tests
 
 ## Future
 * consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance

@@ -1,0 +1,66 @@
+﻿@page
+@model ScribanExpress.Demo.Pages.Blog.IndexModel
+@{
+    ViewData["Title"] = "Blog";
+}
+<div class="form-row">
+
+    <div class="col-5">
+        <div class="form-group">
+            <label for="template">Scriban Template</label>
+            <textarea class="form-control" name="scribanTemplate-input" id="template" rows="15" v-model="template">
+<h2>{{ title }}</h2>
+<ul>
+{{for blog in Blogs }}
+    <li>
+        <h5>{{ blog.title}}</h5> - {{ blog.PublishedDate}}
+    <p>
+        {{ blog.content}}
+    </p>
+    <div style="display: flex; justify-content: flex-end">by: {{ blog.author}}</div>
+    </li>
+{{ end }}
+</ul>
+</textarea>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="form-group">
+            <label for="output">Output</label>
+            <div id="content">content</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="form-row">
+    <div class="col">
+        <button class="btn btn-primary" onclick="generateClick()" >Generate</button>
+    </div>
+</div>
+
+<script>
+
+    const scribanTemplateElement = document.querySelector('textarea[name="scribanTemplate-input"]');
+    const contentElement = document.querySelector('#content');
+
+    async function generateClick() {
+
+        contentElement.innerHTML = scribanTemplateElement.value;
+
+        const url = new URL('/api/Blog',window.location);
+        const params = url.searchParams;
+       
+        params.set('template', scribanTemplateElement.value);
+
+        const response = await fetch(url);
+        const responseText = await response.text();
+        contentElement.innerHTML = responseText;
+    }
+
+</script>
+

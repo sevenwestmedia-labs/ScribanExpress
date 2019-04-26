@@ -30,6 +30,7 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ person.Title }}", "Dr", "enum")]
         [InlineData(@"{{ person.DontSet ?? ""set"" }}", "set", "Coalesce needed")]
         [InlineData(@"{{ person.FirstName ?? ""set"" }}", "Billy", "Coalesce unneeded")]
+        [InlineData(@"{{if person.FirstName == ""Billy"" }}yes{{ end }}", "yes", " == ")]
         public void Render_WithPerson_SuccessfulTests(string templateText, string resultText, string reason)
         {
             var personWrapper = new { person };
