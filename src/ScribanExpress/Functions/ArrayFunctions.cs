@@ -7,7 +7,7 @@ namespace ScribanExpress.Functions
 {
    public class ArrayFunctions
     {
-        public static string Join(IEnumerable list, string delimiter)
+        public static string Join<T>(IEnumerable<T> list, string delimiter)
         {
             if (list == null)
             {

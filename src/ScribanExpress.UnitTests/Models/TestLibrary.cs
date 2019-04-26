@@ -31,6 +31,7 @@ namespace ScribanExpress.UnitTests.Models
             return $"{prefix} {person.LastName}";
         }
 
+        public static string StaticHello(string value) => $"Hello{value}Static";
 
 
         public Deep Deep { get; set; }

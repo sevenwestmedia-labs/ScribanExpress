@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScribanExpress.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,15 @@ namespace ScribanExpress.Helpers
     {
         public static PropertyInfo GetProperty(Type type, string memberName)
         {
-            return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance  | BindingFlags.Public);
             return type.GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
         }
 
         public static MethodInfo GetMethod(Type type, string methodName, IEnumerable<Type> argumentTypes)
         {
-            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, null, (argumentTypes ?? Enumerable.Empty<Type>()).ToArray(), null);
+            return type.GetMethod(methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, null, argumentTypes.ToNullSafe().ToArray(), null);
         }
 
-        public static MethodCallExpression CallMethod(MethodInfo methodInfo, Expression targetObject, IEnumerable<Expression> arguments)
+        public static MethodCallExpression CallMethod(Expression instance, MethodInfo methodInfo,  IEnumerable<Expression> arguments)
         {
             if (methodInfo.IsStatic)
             {
@@ -28,7 +28,7 @@ namespace ScribanExpress.Helpers
             }
             else
             {
-                return Expression.Call(targetObject, methodInfo, arguments);
+                return Expression.Call(instance, methodInfo, arguments);
             }
         }
 
@@ -40,7 +40,7 @@ namespace ScribanExpress.Helpers
                 case PropertyInfo propertyInfo:
                     return Expression.Property(instance, propertyInfo);
                 case MethodInfo methodInfo:
-                    return  ExpressionHelpers.CallMethod(methodInfo, instance, arguments);
+                    return  ExpressionHelpers.CallMethod(instance, methodInfo,  arguments);
                 default:
                     throw new NotSupportedException(); 
             }
