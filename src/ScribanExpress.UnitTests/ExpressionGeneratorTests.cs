@@ -21,7 +21,8 @@ namespace ScribanExpress.UnitTests
             {
                 FirstName = "Billy",
                 Age = 23,
-                Company = new Company { Title = "compname" }
+                Company = new Company { Title = "compname" },
+                Title = TitleType.Dr
             };
         }
 

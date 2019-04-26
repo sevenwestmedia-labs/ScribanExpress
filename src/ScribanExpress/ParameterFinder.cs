@@ -96,7 +96,11 @@ namespace ScribanExpress
             return null;
         }
 
-        public void AddType(ParameterExpression parameterExpression)
+        /// <summary>
+        /// Parameters are accessible via their name And their Property Names
+        /// </summary>
+        /// <param name="parameterExpression"></param>
+        public void AddParameter(ParameterExpression parameterExpression)
         {
             parameterStack.Push(parameterExpression);
         }

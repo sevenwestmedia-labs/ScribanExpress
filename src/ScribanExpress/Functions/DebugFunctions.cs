@@ -10,8 +10,8 @@ namespace ScribanExpress.Functions
     {
         public string ShowMembers<T>(T value)
         {
-            var members = (value.GetType().GetProperties() as MemberInfo[])
-                .Union(value.GetType().GetMethods().Where(m => !m.IsSpecialName));
+            var members = (typeof(T).GetProperties() as MemberInfo[])
+                .Union(typeof(T).GetMethods().Where(m => !m.IsSpecialName));
 
             return members
                 .Select(x => x.Name)

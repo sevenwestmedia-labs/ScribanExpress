@@ -17,5 +17,4 @@ namespace ScribanExpress.Demo.CustomFunction
 
         public DebugFunctions Debug { get; }
     }
-
 }

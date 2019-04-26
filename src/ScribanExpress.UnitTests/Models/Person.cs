@@ -11,6 +11,7 @@ namespace ScribanExpress.UnitTests.Models
         public int Age { get; set; }
         public Company Company { get; set; }
 
+        public TitleType Title { get; set; }
         //public DateTime Birthday { get; set; }
     }
 }

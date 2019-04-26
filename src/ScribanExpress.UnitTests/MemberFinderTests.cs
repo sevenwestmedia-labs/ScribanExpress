@@ -77,30 +77,34 @@ namespace ScribanExpress.UnitTests
             result.ShouldNotBeNull();
 
 
-            
-            var abcconst = Expression.Constant("abc");
-            ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result,new[] { abcconst });
-        }
 
+            var abcconst = Expression.Constant("abc");
+            ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result, new[] { abcconst });
+        }
 
         [Fact]
         public void FindGenericMultiMethod()
         {
             Type stringType = typeof(string);
+            var abcConst = Expression.Constant("abc");
             var argArray = new[] { stringType, stringType, stringType };
 
             var result = memberFinder.FindMember(typeof(MemberCase), "PassIn", argArray);
+
             result.ShouldNotBeNull();
+            ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result, new[] { abcConst, abcConst, abcConst });
+        }
 
-            var methodInfo = result as MethodInfo;
+        [Fact]
+        public void FindGenericNestedGeneicParameter()
+        {
+            //To resolve T in:  <T>(IEnumerable<T> arg) situations
+            var input = new List<string>();
+            Type stringType = typeof(string);
+            var argArray = new[] { input.GetType(), stringType };
 
-            var methodparams = methodInfo.GetParameters();
-            var gargs = methodInfo.GetGenericArguments();
-
-
-            var abcconst = Expression.Constant("abc");
-
-             ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result, new[] { abcconst, abcconst, abcconst });
+            var result = memberFinder.FindMember(typeof(MemberCase), "NestedGenericType", argArray);
+            result.ShouldNotBeNull();
         }
     }
 }

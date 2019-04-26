@@ -1,7 +1,9 @@
 ﻿using ScribanExpress.UnitTests.Helpers;
+using ScribanExpress.UnitTests.Models;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using Xunit;
 
@@ -9,6 +11,42 @@ namespace ScribanExpress.UnitTests
 {
     public class ExpressTemplateManagerTests
     {
+        private readonly Person person;
+
+        public ExpressTemplateManagerTests()
+        {
+            person = new Person()
+            {
+                FirstName = "Billy",
+                LastName = "Bob",
+                Age = 23,
+                Company = new Company { Title = "compname" },
+                Title = TitleType.Dr
+            };
+
+        }
+
+        [Theory]
+        [InlineData(@"{{ person.Title }}", "Dr", "enum")]
+        public void Render_WithPerson_SuccessfulTests(string templateText, string resultText, string reason)
+        {
+            var personWrapper = new { person };
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+
+            var result = expressTemplateManager.Render(templateText, personWrapper);
+
+            result.ShouldBe(resultText, reason);
+        }
+
+        [Theory]
+        [InlineData(@"{{ 9 + 8 }}", "17", "add intergers")]
+        [InlineData(@"{{ 9.1 + 8.2 }}", "17.3", "add double")]
+        public void AddExpression(string templateText, string resultText, string reason)
+        {
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+            var result = expressTemplateManager.Render(templateText, new { });
+            result.ShouldBe(resultText, reason);
+        }
 
         [Fact]
         public void DuplicateTemplate_WithDifferentTargetType()

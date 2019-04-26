@@ -39,6 +39,9 @@ namespace ScribanExpress
                 return genericMethodInfo;
             }
 
+            //search generics
+            //https://stackoverflow.com/questions/5218395/reflection-how-to-get-a-generic-method
+            //https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-examine-and-instantiate-generic-types-with-reflection
 
             return null;
         }

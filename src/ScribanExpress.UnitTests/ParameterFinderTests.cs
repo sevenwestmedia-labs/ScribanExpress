@@ -13,8 +13,8 @@ namespace ScribanExpress.UnitTests
         public void FindProperty()
         {
             var finder = new ParameterFinder();
-            var x = new { Name="someName" };
-            finder.AddType(Expression.Parameter(x.GetType()));
+            var x = new { Name= "someName" };
+            finder.AddParameter(Expression.Parameter(x.GetType()));
 
             var result = finder.GetProperty("Name");
 
@@ -26,7 +26,7 @@ namespace ScribanExpress.UnitTests
         {
             var finder = new ParameterFinder();
             var x = new { Name = "someName" };
-            finder.AddType(Expression.Parameter(x.GetType()));
+            finder.AddParameter(Expression.Parameter(x.GetType()));
 
             var result = finder.GetProperty("naMe");
 

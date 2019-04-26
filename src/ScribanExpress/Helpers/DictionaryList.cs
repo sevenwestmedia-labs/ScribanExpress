@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ScribanExpress.Helpers
 {
+    //one key many items
+    // or should it be a Diction of Dictionaries?
+    //add tests
    public class DictionaryList<TKey,TListItem>
     {
         Dictionary<TKey, List<TListItem>> dictionary =  new Dictionary<TKey, List<TListItem>>();

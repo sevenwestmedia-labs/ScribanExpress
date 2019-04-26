@@ -29,6 +29,7 @@ namespace ScribanExpress.Demo.Api
                     Price = 17.50M,
                     IsFeatured = true,
                     Genres = new List<string> { "horror", "pets" },
+                    Classification = Classifaction.AO
                 },
                 new Movie {
                     Title = "RAmy" ,
@@ -41,6 +42,8 @@ namespace ScribanExpress.Demo.Api
                     Title = "Piranna" ,
                     TallImageUrl ="https://m.media-amazon.com/images/M/MV5BMTg3ODcxNjAzMl5BMl5BanBnXkFtZTgwODM2OTA5NzM@._V1_SY298_SX201_AL_.jpg",
                     Genres = new List<string> { "dwama" },
+                    Classification = Classifaction.M
+
                 }
             };
 

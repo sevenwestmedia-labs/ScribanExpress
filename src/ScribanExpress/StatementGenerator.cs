@@ -26,8 +26,8 @@ namespace ScribanExpress
             ParameterExpression LibraryParameter = Expression.Parameter(typeof(Y));
 
             ParameterFinder parameterFinder = new ParameterFinder();
-            parameterFinder.AddType(LibraryParameter);
-            parameterFinder.AddType(InputParameter);
+            parameterFinder.AddParameter(LibraryParameter);
+            parameterFinder.AddParameter(InputParameter);
 
             var blockExpression = GetStatementExpression(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
 

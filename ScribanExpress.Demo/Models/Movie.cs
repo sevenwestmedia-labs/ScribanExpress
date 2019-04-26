@@ -17,6 +17,14 @@ namespace ScribanExpress.Demo.Models
         public decimal Price { get; set; }
         public bool IsFeatured { get; set; }
 
+        public Classifaction Classification { get; set; }
         public string TallImageUrl { get; set; }
+    }
+
+    public enum Classifaction
+    {
+        G,
+        M,
+        AO
     }
 }
