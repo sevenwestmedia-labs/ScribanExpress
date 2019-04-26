@@ -28,6 +28,8 @@ namespace ScribanExpress.UnitTests
 
         [Theory]
         [InlineData(@"{{ person.Title }}", "Dr", "enum")]
+        [InlineData(@"{{ person.DontSet ?? ""set"" }}", "set", "Coalesce needed")]
+        [InlineData(@"{{ person.FirstName ?? ""set"" }}", "Billy", "Coalesce unneeded")]
         public void Render_WithPerson_SuccessfulTests(string templateText, string resultText, string reason)
         {
             var personWrapper = new { person };
@@ -41,6 +43,7 @@ namespace ScribanExpress.UnitTests
         [Theory]
         [InlineData(@"{{ 9 + 8 }}", "17", "add intergers")]
         [InlineData(@"{{ 9.1 + 8.2 }}", "17.3", "add double")]
+        [InlineData(@"{{ (9 + 8) }}", "17", "brackets")]
         public void AddExpression(string templateText, string resultText, string reason)
         {
             var expressTemplateManager = Factory.CreateExpressTemplateManager();

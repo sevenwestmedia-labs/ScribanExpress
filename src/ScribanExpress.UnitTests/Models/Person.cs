@@ -12,6 +12,8 @@ namespace ScribanExpress.UnitTests.Models
         public Company Company { get; set; }
 
         public TitleType Title { get; set; }
+
+        public string DontSet { get; set; }
         //public DateTime Birthday { get; set; }
     }
 }

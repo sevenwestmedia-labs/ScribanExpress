@@ -45,7 +45,7 @@ dotnet build
 
  ## TODO
 
-  * Allow convertion in functions, e.g pass into double
+ * Allow convertion in functions, e.g pass into double
  * correct folder structure
  * assignment
  * ci/cd
@@ -55,3 +55,7 @@ dotnet build
 ## Future
 * consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance
 * Post benchmarks to a datasource
+* Make StandardLibrary more extenable e.g
+    * dynamic,expando
+    * interfaces with constraints
+    * dictionary (because library should be know at expression compile time, it could be made typesafe)

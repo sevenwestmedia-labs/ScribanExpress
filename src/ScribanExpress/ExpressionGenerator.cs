@@ -96,6 +96,19 @@ namespace ScribanExpress
                 case ScriptNestedExpression scriptNestedExpression:
                     return GetExpressionBody(scriptNestedExpression.Expression, parameterFinder, arguments);
 
+                case ScriptBinaryExpression scriptBinaryExpression:
+                    var leftExpression = GetExpressionBody(scriptBinaryExpression.Left, parameterFinder, null);
+                    var rightExpression = GetExpressionBody(scriptBinaryExpression.Right, parameterFinder, null);
+                    
+                    switch (scriptBinaryExpression.Operator)
+                    {
+                        case ScriptBinaryOperator.Add:
+                            return Expression.Add(leftExpression, rightExpression);
+                        case ScriptBinaryOperator.EmptyCoalescing:
+                            return Expression.Coalesce(leftExpression, rightExpression);
+                        default:
+                            throw new NotImplementedException("Unknown ScriptBinaryExpression Operator");
+                    }
                 default:
                     throw new NotImplementedException($"Unknown Expression Type");
             }
