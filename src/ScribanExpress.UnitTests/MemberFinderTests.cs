@@ -33,13 +33,21 @@ namespace ScribanExpress.UnitTests
         }
 
         [Fact]
+        public void FindMember_WithScribanNamingConvention()
+        {
+            var result = memberFinder.FindMember(typeof(MemberCase), "Do_Stuff", null);
+            result.ShouldBeAssignableTo<MethodInfo>();
+            result.ShouldNotBeNull();
+        }
+
+
+        [Fact]
         public void FindMember_WithNoArguments()
         {
             var result = memberFinder.FindMember(typeof(MemberCase), "DoStuff", null);
             result.ShouldBeAssignableTo<MethodInfo>();
             result.ShouldNotBeNull();
         }
-
 
 
         [Fact]
@@ -65,12 +73,16 @@ namespace ScribanExpress.UnitTests
             var argArray = new[] { stringType };
 
             var result = memberFinder.FindMember(typeof(MemberCase), "PassThrough", argArray);
+            result.ShouldBeAssignableTo<MethodInfo>();
             result.ShouldNotBeNull();
 
 
-            var methodInfo = result as MethodInfo;
+            
             var abcconst = Expression.Constant("abc");
-            var isvalid = ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result,new[] { abcconst });
+            ExpressionHelpers.CallMember(Expression.Constant(new MemberCase()), result,new[] { abcconst });
+        }
+
+
         [Fact]
         public void FindGenericMultiMethod()
         {

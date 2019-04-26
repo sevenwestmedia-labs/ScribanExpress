@@ -1,4 +1,5 @@
-﻿using ScribanExpress.Helpers;
+﻿using ScribanExpress.Extensions;
+using ScribanExpress.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,13 @@ namespace ScribanExpress
     {
         public MemberInfo FindMember(Type type, string memberName, IEnumerable<Type> arguments)
         {
-                        
+            return FindMemberInfo(type, memberName, arguments)
+                // Use Scriban Naming Convention
+                ?? FindMemberInfo(type, memberName.Replace("_",string.Empty), arguments); 
+        }
+
+        private MemberInfo FindMemberInfo(Type type, string memberName, IEnumerable<Type> arguments)
+        {
             var property = ExpressionHelpers.GetProperty(type, memberName);
             if (property != null)
             {
@@ -25,7 +32,7 @@ namespace ScribanExpress
                 return methodInfo;
             }
 
-            var genericMethodInfo = this.MatchGenericMethod(type, memberName, arguments.ToList());
+            var genericMethodInfo = this.MatchGenericMethod(type, memberName, arguments.ToNullSafe().ToList());
 
             if (genericMethodInfo != null)
             {
@@ -44,6 +51,7 @@ namespace ScribanExpress
                             .Where(m => m.IsGenericMethod)
                             .Where(m => m.GetParameters().Length == arguments.Count());
 
+
             foreach (var genericMethodInfo in potentialMatches)
             {
                 var genericVersion = ResolveGenericMethodParameters(genericMethodInfo);
@@ -52,6 +60,7 @@ namespace ScribanExpress
                     return genericVersion;
                 }
             }
+
             // check to see if the supplied types can be used to resolve the genericParamters
             MethodInfo ResolveGenericMethodParameters(MethodInfo potentialmatch)
             {

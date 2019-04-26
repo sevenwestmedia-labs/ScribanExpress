@@ -1,4 +1,5 @@
 using Scriban.Syntax;
+using ScribanExpress.Extensions;
 using ScribanExpress.Helpers;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace ScribanExpress
                         case ScriptUnaryOperator.Not:
                             var right = GetExpressionBody(scriptUnaryExpression.Right, parameterFinder, arguments);
                             return Expression.Not(right);
-                            
+
                         default:
                             throw new NotImplementedException("Unknown ScriptUnaryOperator");
                     }
@@ -57,28 +58,15 @@ namespace ScribanExpress
                     // it's impossible to tell if we have a member or a method, so we check for both
                     var memberTarget = GetExpressionBody(scriptMemberExpression.Target, parameterFinder, null);
                     var memberName = scriptMemberExpression.Member.Name;
-                    var property = ExpressionHelpers.GetProperty(memberTarget.Type, memberName);
-                    if (property != null)
-                    {
-                        return Expression.Property(memberTarget, memberName);
-                    }
-
 
                     // TODO: we should remove the need to calculate a method with Args here, should not need to pass down info
                     // still need the argument list as ScriptPipeCall still needs to pass the args in
-                    var argumentTypeList = arguments?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
-                    var methodInfo = ExpressionHelpers.GetMethod(memberTarget.Type, memberName, argumentTypeList);
+                    var argumentTypeList = arguments.ToNullSafe().Select(e => e.Type);
 
+                    var methodInfo = memberFinder.FindMember(memberTarget.Type, memberName, argumentTypeList);
                     if (methodInfo != null)
                     {
-                        return ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
-                    }
-
-
-                    methodInfo = memberFinder.FindMember(memberTarget.Type, memberName, argumentTypeList) as MethodInfo;
-                    if (methodInfo != null)
-                    {
-                        return ExpressionHelpers.CallMethod(methodInfo, memberTarget, arguments);
+                       return ExpressionHelpers.CallMember(memberTarget, methodInfo, arguments);
                     }
                     throw new KeyNotFoundException("Member Not Found");
 
@@ -101,7 +89,6 @@ namespace ScribanExpress
                         default:
                             throw new NotSupportedException("Pipeline Expression Not Supported");
                     }
-
 
                 case ScriptFunctionCall scriptFunctionCall:
                     return CalculateScriptFunctionCall(scriptFunctionCall, parameterFinder, arguments);
@@ -131,13 +118,12 @@ namespace ScribanExpress
             }
             else
             {
-                var argumentTypes = args?.Select(e => e.Type) ?? Enumerable.Empty<Type>();
-                var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList<Expression>());
-                var functionName = toMember.Member;
-                var methodInfo = memberFinder.FindMember(targetType.Type, functionName.Name, argumentTypes.ToArray());
+                var argumentTypes = args.ToNullSafe().Select(e => e.Type);
+                var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList());
+                ScriptVariable functionNameScript = toMember.Member;
+                var methodInfo = memberFinder.FindMember(targetType.Type, functionNameScript.Name, argumentTypes.ToArray());
                 return ExpressionHelpers.CallMember(targetType, methodInfo, args);
             }
         }
-
     }
 }
