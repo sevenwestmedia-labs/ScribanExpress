@@ -75,8 +75,12 @@ namespace ScribanExpress
                     {
                         genericTargetTypes.Add(methodParameters[i].ParameterType, arguments[i]);
                     }
-                }
 
+                    if (methodParameters[i].ParameterType.IsGenericType)
+                    {
+                        genericTargetTypes.Add(methodParameters[i].ParameterType.GenericTypeArguments[0], arguments[i].GenericTypeArguments[0]);
+                    }
+                }
                 //todo We need to check the the supplied types implement the generic where constraints
 
                 var genericParameters = potentialmatch.GetGenericArguments();

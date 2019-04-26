@@ -33,6 +33,7 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ person.FirstName | Test.Swap ""abc"" }}", "abcBilly", "pipline multi args")]
         [InlineData(@"{{ ""Mr"" | Test.PrefixPerson  person }}", "Mr Bob", "pipline with rich parameter")]
         [InlineData(@"{{ person | Test.GetPersonName | Test.Swap ""abc"" }}", "abcBilly Bob", "multi pipline")]
+        [InlineData(@"{{   ""abc"" | Test.StaticHello }}", "HelloabcStatic", "static method pipline")]
         public void Pipeline_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
@@ -49,14 +50,13 @@ namespace ScribanExpress.UnitTests
             sb.ToString().ShouldBe(resultText, reason);
         }
 
-
-
         [Theory]
         [InlineData(@"{{ Test.ReturnHello  }}", "Hello", "function with no args")]
         [InlineData(@"{{ Test.Repeat  ""abc"" }}", "abcabc", "standard literal func")]
         [InlineData(@"{{ Test.GetPersonName person }}", "Billy Bob", "rich argument")]
         [InlineData(@"{{ Test.Repeat  Test.ReturnHello  }}", "HelloHello", "function to function")]
         [InlineData(@"{{ person.Company.GetCompanyName  true  }}", "COMPNAME", "function to function")]
+        [InlineData(@"{{ Test.StaticHello  ""abc"" }}", "HelloabcStatic", "static method")]
         public void Function_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
@@ -70,8 +70,7 @@ namespace ScribanExpress.UnitTests
 
             functor(sb, presonwrapper, new RootLibary());
 
-
-            Assert.Equal(resultText, sb.ToString());
+            sb.ToString().ShouldBe(resultText, reason);
         }
 
 

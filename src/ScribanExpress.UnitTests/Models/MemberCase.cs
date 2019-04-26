@@ -27,5 +27,10 @@ namespace ScribanExpress.UnitTests.Models
         {
             return item;
         }
+
+        public string NestedGenericType<T>(IEnumerable<T> list, string delimiter)
+        {
+            return delimiter;
+        }
     }
 }
