@@ -21,7 +21,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ if item.someValue }}value is true{{ end }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(itemWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(itemWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -40,7 +40,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ if item.someValue }}value is true{{ else }} value is not true {{ end }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(presonwrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(presonwrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -58,7 +58,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ if !item.someValue }}value is false{{ end }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(presonwrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(presonwrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -83,7 +83,7 @@ namespace ScribanExpress.UnitTests
 {{ end }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(itemWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(itemWrapper, template.Page.Body);
             var functor = result.Compile();
 
             // test else if
@@ -107,7 +107,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ if item.someValue }}value is {{ item.someValue.ToString.ToLower }}{{ end }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(itemWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(itemWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -125,8 +125,8 @@ namespace ScribanExpress.UnitTests
 
             var templateText = @"{{ if item.someValue }}someValue is true.{{ if someOtherValue }}{{ else }}someOtherValue is false{{ end }}{{ end }}";
             var template = Template.Parse(templateText, null, null, null);
-
-            var result = AnonGenerate(itemWrapper, template.Page.Body);
+  
+            var result = Factory.AnonGenerate(itemWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -134,11 +134,6 @@ namespace ScribanExpress.UnitTests
             functor(sb, itemWrapper, null);
 
             sb.ToString().ShouldBe("someValue is true.someOtherValue is false");
-        }
-
-        public Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
-        {
-            return Factory.CreateStatementGenerator().Generate<T, object>(scriptBlockStatement);
         }
     }
 }

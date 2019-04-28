@@ -29,10 +29,12 @@ namespace ScribanExpress.UnitTests
         [Fact]
         public void RawTextBlock()
         {
+            var statementGenerator = new StatementGenerator(new NullLogger<StatementGenerator>());
+
             var templateText = @"This is a World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new StatementGenerator(new NullLogger<StatementGenerator>()).Generate<string, object>(template.Page.Body);
+            var result = statementGenerator.Generate<string, object>(new ExpressContext(), template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -49,7 +51,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"This is a {{ Length }} World from scriban!";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = new StatementGenerator(new NullLogger<StatementGenerator>()).Generate<string, object>(template.Page.Body);
+            var result = new StatementGenerator(new NullLogger<StatementGenerator>()).Generate<string, object>(new ExpressContext() ,template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -66,7 +68,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ person.FirstName }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(personWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -84,7 +86,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ person.FirstName }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(person, template.Page.Body);
+            var result = Factory.AnonGenerate(person, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -104,7 +106,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ person.Age }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(personWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(personWrapper, template.Page.Body);
             var functor = result.Compile();
 
 
@@ -123,7 +125,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ person.Company.Title }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(personWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -143,7 +145,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"{{ person.FirstName | string.downcase }}"; 
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(personWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -161,7 +163,7 @@ namespace ScribanExpress.UnitTests
             var templateText = @"blah blah {{ person.Age.ToString ""C"" }}";
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(personWrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(personWrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -202,7 +204,7 @@ namespace ScribanExpress.UnitTests
 
             var anon = new { oneperson, twoperson };
 
-            var result = AnonGenerate(anon, template.Page.Body);
+            var result = Factory.AnonGenerate(anon, template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -210,11 +212,5 @@ namespace ScribanExpress.UnitTests
 
             Assert.Equal("Billy Bob", sb.ToString());
         }
-
-        public Expression<Action<StringBuilder,T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
-        {
-            return Factory.CreateStatementGenerator().Generate<T, object>(scriptBlockStatement);
-        }
-
     }
 }

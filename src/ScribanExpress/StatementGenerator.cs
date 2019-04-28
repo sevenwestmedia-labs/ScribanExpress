@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Scriban.Parsing;
 using Scriban.Syntax;
+using ScribanExpress.Exceptions;
 using ScribanExpress.Helpers;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace ScribanExpress
             this.logger = logger;
         }
 
-        public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ScriptBlockStatement scriptBlockStatement)
+        public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ExpressContext expressContext, ScriptBlockStatement scriptBlockStatement)
         {
             ParameterExpression StringBuilderParmeter = Expression.Parameter(typeof(StringBuilder));
             ParameterExpression InputParameter = Expression.Parameter(typeof(T));
@@ -29,12 +31,12 @@ namespace ScribanExpress
             parameterFinder.AddParameter(LibraryParameter);
             parameterFinder.AddParameter(InputParameter);
 
-            var blockExpression = GetStatementExpression(StringBuilderParmeter, scriptBlockStatement, parameterFinder);
+            var blockExpression = GetStatementExpression(expressContext, StringBuilderParmeter, scriptBlockStatement, parameterFinder);
 
             return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
         }
 
-        public Expression GetStatementExpression(ParameterExpression stringBuilderParameter, ScriptStatement scriptStatement, ParameterFinder parameterFinder)
+        public Expression GetStatementExpression(ExpressContext expressContext, ParameterExpression stringBuilderParameter, ScriptStatement scriptStatement, ParameterFinder parameterFinder)
         {
             var appendMethodInfo = typeof(StringBuilder).GetMethod("Append", new[] { typeof(string) });
 
@@ -53,11 +55,11 @@ namespace ScribanExpress
 
                 case ScriptIfStatement scriptIfStatement:
                     var predicateExpression = expressionGenerator.GetExpressionBody(scriptIfStatement.Condition, parameterFinder, null);
-                    var trueStatementBlock = GetStatementExpression(stringBuilderParameter, scriptIfStatement.Then, parameterFinder);
+                    var trueStatementBlock = GetStatementExpression(expressContext, stringBuilderParameter, scriptIfStatement.Then, parameterFinder);
 
                     if (scriptIfStatement.Else != null)
                     {
-                        var elseStatment = GetStatementExpression(stringBuilderParameter, scriptIfStatement.Else, parameterFinder);
+                        var elseStatment = GetStatementExpression(expressContext, stringBuilderParameter, scriptIfStatement.Else, parameterFinder);
                         ConditionalExpression ifThenElseExpr = Expression.IfThenElse(predicateExpression, trueStatementBlock, elseStatment);
                         return ifThenElseExpr;
                     }
@@ -68,7 +70,7 @@ namespace ScribanExpress
                     }
 
                 case ScriptElseStatement scriptElseStatement:
-                    var elseStatmentExpression = GetStatementExpression(stringBuilderParameter, scriptElseStatement.Body, parameterFinder);
+                    var elseStatmentExpression = GetStatementExpression(expressContext, stringBuilderParameter, scriptElseStatement.Body, parameterFinder);
                     return elseStatmentExpression;
 
                 case ScriptBlockStatement scriptBlockStatement:
@@ -77,11 +79,17 @@ namespace ScribanExpress
                     {
                         try
                         {
-                            statements.Add(GetStatementExpression(stringBuilderParameter, statement, parameterFinder));
+                            statements.Add(GetStatementExpression(expressContext, stringBuilderParameter, statement, parameterFinder));
+                        }
+                        catch (SpanException ex)
+                        {
+                            logger.LogError(ex, "Failed to build: {statement}", statement);
+                            expressContext.Messages.Add(new LogMessage(ParserMessageType.Error, ex.Span, ex.Message));
                         }
                         catch (Exception ex)
                         {
                             logger.LogError(ex, "Statement Failed to build: {statement}", statement);
+                            expressContext.Messages.Add(new LogMessage(ParserMessageType.Error, scriptBlockStatement.Span, $"Statement Failed to build: {statement?.GetType()}"));
                         }
                     }
                     var blockExpression = Expression.Block(statements);
@@ -97,7 +105,7 @@ namespace ScribanExpress
                     using (var scopedParameterFinder = parameterFinder.CreateScope())
                     {
                         scopedParameterFinder.AddLocalVariable(itemVariable);
-                        var body = GetStatementExpression(stringBuilderParameter, scriptForStatement.Body, scopedParameterFinder);
+                        var body = GetStatementExpression(expressContext, stringBuilderParameter, scriptForStatement.Body, scopedParameterFinder);
                         var foreachExpression = ExpressionHelpers.ForEach(itemsExpression, itemVariable, body);
                         return foreachExpression;
                     }

@@ -1,4 +1,5 @@
 using Scriban.Syntax;
+using ScribanExpress.Exceptions;
 using ScribanExpress.Extensions;
 using ScribanExpress.Helpers;
 using System;
@@ -36,7 +37,7 @@ namespace ScribanExpress
                     var variable = parameterFinder.GetProperty(scriptVariableGlobal.Name);
                     if (variable == null)
                     {
-                        throw new KeyNotFoundException("Variable Not Found");
+                        throw new SpanException($"Variable Not Found: {scriptVariableGlobal.Name}", scriptVariableGlobal.Span);
                     }
                     return variable;
 
@@ -51,7 +52,7 @@ namespace ScribanExpress
                             return Expression.Not(right);
 
                         default:
-                            throw new NotImplementedException("Unknown ScriptUnaryOperator");
+                            throw new SpanException($"Unknown ScriptUnaryOperator: {scriptUnaryExpression.Operator}", scriptUnaryExpression.Span);
                     }
 
                 case ScriptMemberExpression scriptMemberExpression:
@@ -66,9 +67,9 @@ namespace ScribanExpress
                     var methodInfo = memberFinder.FindMember(memberTarget.Type, memberName, argumentTypeList);
                     if (methodInfo != null)
                     {
-                       return ExpressionHelpers.CallMember(memberTarget, methodInfo, arguments);
+                        return ExpressionHelpers.CallMember(memberTarget, methodInfo, arguments);
                     }
-                    throw new KeyNotFoundException("Member Not Found");
+                    throw new SpanException($"Member Not Found: {memberName}", scriptMemberExpression.Span);
 
                 case ScriptPipeCall scriptPipeCall:
                     // I'm not a huge fan of this because it requires pushing args down to sub nodes, could cause issues with multi funtions tree
@@ -109,10 +110,10 @@ namespace ScribanExpress
                         case ScriptBinaryOperator.CompareEqual:
                             return Expression.Equal(leftExpression, rightExpression);
                         default:
-                            throw new NotImplementedException("Unknown ScriptBinaryExpression Operator");
+                            throw new SpanException($"Unknown ScriptBinaryExpression Operator: {scriptBinaryExpression.Operator}", scriptBinaryExpression.Span);
                     }
                 default:
-                    throw new NotImplementedException($"Unknown Expression Type");
+                    throw new SpanException($"Unknown Expression Type: {scriptExpression?.GetType()}", scriptExpression.Span);
             }
         }
 

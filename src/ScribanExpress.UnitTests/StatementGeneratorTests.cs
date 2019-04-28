@@ -16,14 +16,13 @@ namespace ScribanExpress.UnitTests
             statementGenerator = Factory.CreateStatementGenerator();
         }
 
-
         [Fact]
         public void RawScriptStatement()
         {
             var block = ScriptStatementHelper.CreateScriptBlockStatement();
             block.Statements.Add(ScriptStatementHelper.CreateScriptRawStatement("hello"));
 
-            var action = statementGenerator.Generate<string, string>(block);
+            var action = statementGenerator.Generate<string, string>(new ExpressContext(), block);
 
             var compiled = action.Compile();
 
@@ -41,7 +40,7 @@ namespace ScribanExpress.UnitTests
             block.Statements.Add(ScriptStatementHelper.CreateScriptRawStatement("hello"));
             block.Statements.Add(ScriptStatementHelper.CreateScriptRawStatement("world"));
                         
-            var lambda = statementGenerator.Generate<string, object>(block);
+            var lambda = statementGenerator.Generate<string, object>(new ExpressContext(), block);
             var result = ExecuteStatments(lambda, null, null);
 
             result.ShouldBe("helloworld");
@@ -60,7 +59,7 @@ namespace ScribanExpress.UnitTests
 
             block.Statements.Add(ScriptStatementHelper.CreateScriptRawStatement("world"));
 
-            var lambda = statementGenerator.Generate<string, object>(block);
+            var lambda = statementGenerator.Generate<string, object>(new ExpressContext(), block);
             var result = ExecuteStatments(lambda, null, null);
 
             result.ShouldBe("helloworld");
@@ -76,6 +75,5 @@ namespace ScribanExpress.UnitTests
 
             return sb.ToString();
         }
-
     }
 }

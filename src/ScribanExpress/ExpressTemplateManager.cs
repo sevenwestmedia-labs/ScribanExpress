@@ -30,12 +30,17 @@ namespace ScribanExpress
 
         private Func<T, string> GetFunc<T>(string templateText)
         {
-            Func<string, object> Compiler = _ =>
+            
+            Func<string, Action<StringBuilder, T, L>> Compiler = _ =>
                 {
+                    
+                    ExpressContext expressContext = new ExpressContext();
+                    logger.LogInformation("Compiling {templateText} for {type}", templateText, typeof(T));
                     try
                     {
-                        logger.LogInformation("Compiling {templateText} for {type}", templateText, typeof(T));
                         var template = Template.Parse(templateText, null, null, null);
+                        expressContext.Messages.AddRange(template.Messages);
+
                         if (template.HasErrors)
                         {
                             logger.LogError("Scriban Parsing Failed on {templateText} for {type}", templateText, typeof(T));
@@ -43,7 +48,7 @@ namespace ScribanExpress
                         else {
                             logger.LogInformation("Scriban Parsing Succeded on {templateText} for {type}", templateText, typeof(T));
                         }
-                        var expression = statementGenerator.Generate<T, L>(template.Page.Body);
+                        var expression = statementGenerator.Generate<T, L>(expressContext, template.Page.Body);
                         var compiled = expression.Compile();
                         return compiled;
                     }

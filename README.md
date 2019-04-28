@@ -5,8 +5,6 @@
 * Compiles Scribans AST into Cached Expression Trees
 * At this point Security has not been considered, templates should be controlled by trusted individuals
 
-
-
 ## Build and Test
 
 ### Build
@@ -41,8 +39,7 @@ dotnet build
 					metric only on error might be ok
 			if scriban breaks? 
 				what are our options? should we return a default or throw
- * renamer
- * list functions
+  * list functions
 
  ## TODO
 
@@ -54,11 +51,19 @@ dotnet build
  * documentation
  * add scriban default library
  * look into truthy tests
+ * improve exensibility (standard library)
+ * Null propagation/null conditional
+ * Dictionary Support
+ * Raise better errors/messaging
 
 ## Future
 * consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance
 * Post benchmarks to a datasource
+* Consider rich errors (copy scriban instead of exceptions)
 * Make StandardLibrary more extenable e.g
     * dynamic,expando
     * interfaces with constraints
     * dictionary (because library should be know at expression compile time, it could be made typesafe)
+* Look into async
+* casting (named methods?, variable types?)
+* better error managment (EventPipe?) for broken templates/rendering errors

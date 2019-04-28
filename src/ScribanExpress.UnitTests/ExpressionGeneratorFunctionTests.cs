@@ -80,7 +80,7 @@ namespace ScribanExpress.UnitTests
 
         public Expression<Action<StringBuilder,T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return Factory.CreateStatementGenerator().Generate<T, RootLibary>(scriptBlockStatement);
+            return Factory.CreateStatementGenerator().Generate<T, RootLibary>(new ExpressContext(), scriptBlockStatement);
         }
     }
 }
