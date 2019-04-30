@@ -45,8 +45,8 @@ steps:
 - task: BuildQualityChecks@5
   inputs:
     checkCoverage: true
+    coverageType: branches
     coverageFailOption: 'fixed'
     coverageThreshold: '69'
-
 
 - script: cd $(Build.SourcesDirectory) && ls
