@@ -42,4 +42,11 @@ steps:
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)'
 
+- task: BuildQualityChecks@5
+  inputs:
+    checkCoverage: true
+    coverageFailOption: 'fixed'
+    coverageThreshold: '69'
+
+
 - script: cd $(Build.SourcesDirectory) && ls
