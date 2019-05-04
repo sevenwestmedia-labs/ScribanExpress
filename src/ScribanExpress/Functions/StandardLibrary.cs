@@ -9,13 +9,13 @@ namespace ScribanExpress.Functions
     {
         public StandardLibrary()
         {
-            Date = new DateTimeFunctions();
+            Date = new DateFunctions();
             String = new StringFunctions();
             TimeSpan = new TimeSpanFunctions();
             Array = new ArrayFunctions();
         }
 
-        public DateTimeFunctions Date { get; }
+        public DateFunctions Date { get; }
 
         public StringFunctions String { get; }
 

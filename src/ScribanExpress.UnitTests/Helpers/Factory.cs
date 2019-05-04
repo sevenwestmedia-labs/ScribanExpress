@@ -2,6 +2,7 @@
 using Scriban.Syntax;
 using ScribanExpress.Abstractions;
 using ScribanExpress.Functions;
+using ScribanExpress.UnitTests.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -13,7 +14,7 @@ namespace ScribanExpress.UnitTests.Helpers
     {
         public static IExpressTemplateManager CreateExpressTemplateManager()
         {
-            return new ExpressTemplateManager<StandardLibrary>(new NullLogger<ExpressTemplateManager<StandardLibrary>>(), new StandardLibrary(), new StatementGenerator(new NullLogger<StatementGenerator>()));
+            return new ExpressTemplateManager<RootLibary>(new NullLogger<ExpressTemplateManager<RootLibary>>(), new RootLibary(), new StatementGenerator(new NullLogger<StatementGenerator>()));
         }
 
         public static StatementGenerator CreateStatementGenerator()

@@ -39,6 +39,11 @@ namespace ScribanExpress.UnitTests.Models
         {
             return value;
         }
+
+        public double Double(double item) 
+        {
+            return item * 2;
+        }
     }
     public class Deep
     {

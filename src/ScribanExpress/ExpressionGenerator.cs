@@ -2,6 +2,7 @@ using Scriban.Syntax;
 using ScribanExpress.Exceptions;
 using ScribanExpress.Extensions;
 using ScribanExpress.Helpers;
+using ScribanExpress.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace ScribanExpress
     public class ExpressionGenerator
     {
         private readonly MemberFinder memberFinder;
+        private readonly TypeConverter typeConverter;
 
         public ExpressionGenerator()
         {
             memberFinder = new MemberFinder();
+            typeConverter = new TypeConverter();
         }
 
 
@@ -67,7 +70,8 @@ namespace ScribanExpress
                     var methodInfo = memberFinder.FindMember(memberTarget.Type, memberName, argumentTypeList);
                     if (methodInfo != null)
                     {
-                        return ExpressionHelpers.CallMember(memberTarget, methodInfo, arguments);
+                        var convertedArgs = ConvertArgs(methodInfo as MethodInfo, arguments);
+                        return ExpressionHelpers.CallMember(memberTarget, methodInfo, convertedArgs);
                     }
                     throw new SpanException($"Member Not Found: {memberName}", scriptMemberExpression.Span);
 
@@ -104,6 +108,7 @@ namespace ScribanExpress
                     switch (scriptBinaryExpression.Operator)
                     {
                         case ScriptBinaryOperator.Add:
+                            leftExpression = ConvertIfNeeded(leftExpression, rightExpression.Type);
                             return Expression.Add(leftExpression, rightExpression);
                         case ScriptBinaryOperator.EmptyCoalescing:
                             return Expression.Coalesce(leftExpression, rightExpression);
@@ -138,8 +143,28 @@ namespace ScribanExpress
                 var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList());
                 ScriptVariable functionNameScript = toMember.Member;
                 var methodInfo = memberFinder.FindMember(targetType.Type, functionNameScript.Name, argumentTypes.ToArray());
-                return ExpressionHelpers.CallMember(targetType, methodInfo, args);
+                var convertedArgs = ConvertArgs(methodInfo as MethodInfo, args);
+                return ExpressionHelpers.CallMember(targetType, methodInfo, convertedArgs);
             }
         }
+        IEnumerable<Expression>  ConvertArgs(MethodInfo target, IEnumerable<Expression> expressions)
+        {
+            var methodParameters = target.GetParameters();
+            foreach ((var index, var item) in expressions.ToNullSafe().GetIndexedEnumerable())
+            {
+                yield return ConvertIfNeeded(item, methodParameters[index].ParameterType);
+        }
+        public Expression ConvertIfNeeded(Expression from, Type toType)
+        {
+            if (typeConverter.CanConvert(from.Type, toType))
+            {
+                return Expression.Convert(from, toType);
+            }
+            else
+            {
+                return from;
+            }
+        }
+
     }
 }

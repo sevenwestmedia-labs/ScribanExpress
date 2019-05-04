@@ -44,7 +44,9 @@ namespace ScribanExpress.UnitTests
         [Theory]
         [InlineData(@"{{ 9 + 8 }}", "17", "add intergers")]
         [InlineData(@"{{ 9.1 + 8.2 }}", "17.3", "add double")]
+        [InlineData(@"{{ 9 + 8.3 }}", "17.3", "add different number types")]
         [InlineData(@"{{ (9 + 8) }}", "17", "brackets")]
+        [InlineData(@"{{ Test.double 8 }}", "16", "convert")]
         public void AddExpression(string templateText, string resultText, string reason)
         {
             var expressTemplateManager = Factory.CreateExpressTemplateManager();

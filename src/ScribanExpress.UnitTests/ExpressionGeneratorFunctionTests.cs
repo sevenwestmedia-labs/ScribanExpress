@@ -23,7 +23,8 @@ namespace ScribanExpress.UnitTests
                 FirstName = "Billy",
                 LastName = "Bob",
                 Age = 23,
-                Company = new Company { Title = "compname" }
+                Company = new Company { Title = "compname" },
+                Birthday = DateTime.Parse("2019-6-22")
             };
         }
 
@@ -57,6 +58,7 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ Test.Repeat  Test.ReturnHello  }}", "HelloHello", "function to function")]
         [InlineData(@"{{ person.Company.GetCompanyName  true  }}", "COMPNAME", "function to function")]
         [InlineData(@"{{ Test.StaticHello  ""abc"" }}", "HelloabcStatic", "static method")]
+        [InlineData(@"{{ (person.Birthday | date.AddDays 3).tostring ""dd"" }}", "25", "conversion")]
         public void Function_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };
