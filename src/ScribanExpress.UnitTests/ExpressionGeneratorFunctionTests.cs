@@ -59,6 +59,7 @@ namespace ScribanExpress.UnitTests
         [InlineData(@"{{ person.Company.GetCompanyName  true  }}", "COMPNAME", "function to function")]
         [InlineData(@"{{ Test.StaticHello  ""abc"" }}", "HelloabcStatic", "static method")]
         [InlineData(@"{{ (person.Birthday | date.AddDays 3).tostring ""dd"" }}", "25", "conversion")]
+        [InlineData(@"{{ test.GetStaticDate.tostring ""yyyy"" }}", "2019", "end function arguments")]
         public void Function_Tests(string templateText, string resultText, string reason)
         {
             var presonwrapper = new { person };

@@ -1,11 +1,13 @@
 # Scriban Express
 
 * Scriban Express is desgined for rendering lots of small simple templates, quickly
-* Is is a subset of Scriban (mainly due to lack of time)
+* Subset of Scriban (mainly due to lack of time)
 * Compiles Scribans AST into Cached Expression Trees
 * At this point Security has not been considered, templates should be controlled by trusted individuals
 
 ## Build and Test
+
+[![Build Status](https://dev.azure.com/sevenwestmedia/Inferno/_apis/build/status/sevenwestmedia-labs.ScribanExpress?branchName=master)](https://dev.azure.com/sevenwestmedia/Inferno/_build/latest?definitionId=248&branchName=master)
 
 ### Build
 
@@ -45,6 +47,7 @@ dotnet build
  * More implicit conversion
 
 ## Future
+
 * consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance
 * Post benchmarks to a datasource
 * Consider rich errors (copy scriban instead of exceptions)

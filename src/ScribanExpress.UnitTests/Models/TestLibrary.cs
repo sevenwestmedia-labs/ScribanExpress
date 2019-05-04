@@ -31,6 +31,11 @@ namespace ScribanExpress.UnitTests.Models
             return $"{prefix} {person.LastName}";
         }
 
+        public static DateTime GetStaticDate()
+        {
+            return DateTime.Parse("2019-4-23");
+        }
+
         public static string StaticHello(string value) => $"Hello{value}Static";
 
 

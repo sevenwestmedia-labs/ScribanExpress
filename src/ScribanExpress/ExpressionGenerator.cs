@@ -140,7 +140,7 @@ namespace ScribanExpress
             else
             {
                 var argumentTypes = args.ToNullSafe().Select(e => e.Type);
-                var targetType = GetExpressionBody(toMember.Target, parameterFinder, args.ToList());
+                var targetType = GetExpressionBody(toMember.Target, parameterFinder, null);
                 ScriptVariable functionNameScript = toMember.Member;
                 var methodInfo = memberFinder.FindMember(targetType.Type, functionNameScript.Name, argumentTypes.ToArray());
                 var convertedArgs = ConvertArgs(methodInfo as MethodInfo, args);
@@ -153,6 +153,7 @@ namespace ScribanExpress
             foreach ((var index, var item) in expressions.ToNullSafe().GetIndexedEnumerable())
             {
                 yield return ConvertIfNeeded(item, methodParameters[index].ParameterType);
+            }
         }
         public Expression ConvertIfNeeded(Expression from, Type toType)
         {
