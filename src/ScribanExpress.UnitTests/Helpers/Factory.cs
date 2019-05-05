@@ -22,9 +22,9 @@ namespace ScribanExpress.UnitTests.Helpers
             return new StatementGenerator(new NullLogger<StatementGenerator>());
         }
 
-        public static Expression<Action<StringBuilder, T, object>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
+        public static Expression<Action<StringBuilder, T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
         {
-            return Factory.CreateStatementGenerator().Generate<T, object>(new ExpressContext(), scriptBlockStatement);
+            return Factory.CreateStatementGenerator().Generate<T, RootLibary>(new ExpressContext(), scriptBlockStatement);
         }
 
     }

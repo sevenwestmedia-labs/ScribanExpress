@@ -41,7 +41,7 @@ namespace ScribanExpress.UnitTests
 
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(presonwrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(presonwrapper, template.Page.Body);
 
             var functor = result.Compile();
 
@@ -66,7 +66,7 @@ namespace ScribanExpress.UnitTests
 
             var template = Template.Parse(templateText, null, null, null);
 
-            var result = AnonGenerate(presonwrapper, template.Page.Body);
+            var result = Factory.AnonGenerate(presonwrapper, template.Page.Body);
 
             var functor = result.Compile();
             var sb = new StringBuilder();
@@ -74,16 +74,6 @@ namespace ScribanExpress.UnitTests
             functor(sb, presonwrapper, new RootLibary());
 
             sb.ToString().ShouldBe(resultText, reason);
-        }
-
-
-        //we need to error better for unknow method
-        // test with   var templateText = @"{{ person.FirstName | Test.Deep.Appender ""abc""}}";
-
-
-        public Expression<Action<StringBuilder,T, RootLibary>> AnonGenerate<T>(T value, ScriptBlockStatement scriptBlockStatement)
-        {
-            return Factory.CreateStatementGenerator().Generate<T, RootLibary>(new ExpressContext(), scriptBlockStatement);
         }
     }
 }

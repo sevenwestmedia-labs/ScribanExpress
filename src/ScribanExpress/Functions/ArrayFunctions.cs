@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ScribanExpress.Functions
@@ -26,6 +27,16 @@ namespace ScribanExpress.Functions
                 afterFirst = true;
             }
             return text.ToString();
+        }
+
+        public static IEnumerable<T> Reverse<T>(IEnumerable<T> list)
+        {
+            if (list == null)
+            {
+                return Enumerable.Empty<T>();
+            }
+            
+            return list.Reverse();
         }
     }
 }
