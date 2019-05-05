@@ -24,16 +24,16 @@ namespace ScribanExpress
         public Expression<Action<StringBuilder, T, Y>> Generate<T, Y>(ExpressContext expressContext, ScriptBlockStatement scriptBlockStatement)
         {
             ParameterExpression StringBuilderParmeter = Expression.Parameter(typeof(StringBuilder));
-            ParameterExpression InputParameter = Expression.Parameter(typeof(T));
-            ParameterExpression LibraryParameter = Expression.Parameter(typeof(Y));
+            ParameterExpression inputParameter = Expression.Parameter(typeof(T), "Model");
+            ParameterExpression libraryParameter = Expression.Parameter(typeof(Y), "Library");
 
             ParameterFinder parameterFinder = new ParameterFinder();
-            parameterFinder.AddParameter(LibraryParameter);
-            parameterFinder.AddParameter(InputParameter);
+            parameterFinder.AddParameter(libraryParameter);
+            parameterFinder.AddParameter(inputParameter);
 
             var blockExpression = GetStatementExpression(expressContext, StringBuilderParmeter, scriptBlockStatement, parameterFinder);
 
-            return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, InputParameter, LibraryParameter);
+            return Expression.Lambda<Action<StringBuilder, T, Y>>(blockExpression, StringBuilderParmeter, inputParameter, libraryParameter);
         }
 
         public Expression GetStatementExpression(ExpressContext expressContext, ParameterExpression stringBuilderParameter, ScriptStatement scriptStatement, ParameterFinder parameterFinder)

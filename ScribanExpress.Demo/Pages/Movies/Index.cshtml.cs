@@ -19,7 +19,9 @@ namespace ScribanExpress.Demo.Pages.Movies
               "{{ movie.Title | string.truncate 10 }} </br> {{ movie.Title.tolower | string.capitalize }}",
               "{{ if movie.IsFeatured }}Featured: {{ end }}{{ movie.Title }}",
               @"{{ movie.Genres | array.join "",""   }}",
-              "{{ movie | debug.ShowMembers }}"
+              "{{ movie | debug.ShowMembers }}",
+              "{{ library | debug.ShowMembers }}",
+              "{{ model | debug.ShowMembers }}"
             };
 
         

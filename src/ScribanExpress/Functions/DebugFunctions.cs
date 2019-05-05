@@ -11,7 +11,11 @@ namespace ScribanExpress.Functions
         public string ShowMembers<T>(T value)
         {
             var members = (typeof(T).GetProperties() as MemberInfo[])
-                .Union(typeof(T).GetMethods().Where(m => !m.IsSpecialName));
+                .Union(typeof(T)
+                        .GetMethods()
+                        .Where(m => m.DeclaringType != typeof(object))
+                        .Where(m => !m.IsSpecialName)
+                       );
 
             return members
                 .Select(x => x.Name)

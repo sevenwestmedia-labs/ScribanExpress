@@ -30,14 +30,14 @@ namespace ScribanExpress
                 return local;
             }
             else {
-                var globalParam = FindGlobalObject(propertyName);
+                var globalParam = FindNamespaceProperty(propertyName);
                 if (globalParam != null)
                 {
                     return Expression.Property(globalParam, propertyName);
                 }
                 else
                 {
-                    return FindRootObject(propertyName);
+                    return FindNamespaceParameter(propertyName);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace ScribanExpress
         {
             foreach (var parameterExpression in localStack)
             {
-                if (parameterExpression.Name == propertyName)
+                if (String.Equals(parameterExpression.Name, propertyName, StringComparison.OrdinalIgnoreCase))
                 {
                     return parameterExpression;
                 }
@@ -59,7 +59,8 @@ namespace ScribanExpress
             return null;
         }
 
-        public ParameterExpression FindGlobalObject(string propertyName)
+        
+        public ParameterExpression FindNamespaceProperty(string propertyName)
         {
             foreach (var parameterExpression in parameterStack)
             {
@@ -72,17 +73,17 @@ namespace ScribanExpress
 
             if (parentFinder != null)
             {
-                return parentFinder.FindGlobalObject(propertyName);
+                return parentFinder.FindNamespaceProperty(propertyName);
             }
 
             return null;
         }
 
-        public ParameterExpression FindRootObject(string propertyName)
+        public ParameterExpression FindNamespaceParameter(string propertyName)
         {
             foreach (var parameterExpression in parameterStack)
             {
-                if (parameterExpression.Name == propertyName)
+                if (String.Equals(parameterExpression.Name, propertyName, StringComparison.OrdinalIgnoreCase))
                 {
                     return parameterExpression;
                 }
@@ -90,7 +91,7 @@ namespace ScribanExpress
 
             if (parentFinder != null)
             {
-                return parentFinder.FindRootObject(propertyName);
+                return parentFinder.FindNamespaceParameter(propertyName);
             }
             return null;
         }
