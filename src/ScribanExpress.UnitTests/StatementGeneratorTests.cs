@@ -1,4 +1,7 @@
-﻿using ScribanExpress.UnitTests.Helpers;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using ScribanExpress.Functions;
+using ScribanExpress.UnitTests.Helpers;
+using ScribanExpress.UnitTests.Models;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -65,6 +68,17 @@ namespace ScribanExpress.UnitTests
             result.ShouldBe("helloworld");
         }
 
+        [Fact]
+        public void SafeToString_WithNullObject()
+        {
+            Person person = new Person { };
+            ExpressTemplateManager<StandardLibrary> expressTemplateManager = new ExpressTemplateManager<StandardLibrary>(new NullLogger<ExpressTemplateManager<StandardLibrary>>(), null, Factory.CreateStatementGenerator());
+            var context = expressTemplateManager.GetExpressContext<Person>("{{ company }}");
+
+            var renderResult = expressTemplateManager.Render(context, person);
+
+            renderResult.ShouldBe(string.Empty);
+        }
 
         private string ExecuteStatments<T,Y>(Expression<Action<StringBuilder,T,Y>> lambda, T input, Y library)
         {
