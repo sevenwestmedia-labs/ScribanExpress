@@ -115,6 +115,25 @@ namespace ScribanExpress
             }
         }
 
-        public Expression AddToString(Expression input) => (input.Type != typeof(string)) ? Expression.Call(input, "ToString", null, null) : input;
+        public Expression AddToString(Expression input)
+        {
+            // only call tostring if not already a string and is not null
+            if (input.Type != typeof(string)) {
+                var safetoString = ExpressionHelpers.GetMethodInfo(() => SafeToString(default));
+                if (input.Type.IsValueType)
+                {
+                    // can't be null, so won't fail
+                    return Expression.Call(input, "ToString", null, null);
+                }
+                else
+                {
+                    return Expression.Call(null, safetoString, input);
+                }
+            }
+
+            return input;
+        }
+
+        public static string SafeToString(object input) => input == null ? null : input.ToString();
     }
 }

@@ -109,6 +109,7 @@ namespace ScribanExpress
                     {
                         case ScriptBinaryOperator.Add:
                             leftExpression = ConvertIfNeeded(leftExpression, rightExpression.Type);
+                            rightExpression = ConvertIfNeeded(rightExpression, leftExpression.Type);
                             return Expression.Add(leftExpression, rightExpression);
                         case ScriptBinaryOperator.EmptyCoalescing:
                             return Expression.Coalesce(leftExpression, rightExpression);

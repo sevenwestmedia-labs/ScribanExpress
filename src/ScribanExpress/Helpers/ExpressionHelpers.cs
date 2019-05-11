@@ -39,6 +39,35 @@ namespace ScribanExpress.Helpers
 
         }
 
+        //http://blog.functionalfun.net/2009/10/getting-methodinfo-of-generic-method.html
+        /// <summary>
+        /// Given a lambda expression that calls a method, returns the method info.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        public static MethodInfo GetMethodInfo(Expression<Action> expression)
+        {
+            return GetMethodInfo((LambdaExpression)expression);
+        }
+
+        /// <summary>
+        /// Given a lambda expression that calls a method, returns the method info.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        public static MethodInfo GetMethodInfo(LambdaExpression expression)
+        {
+            MethodCallExpression outermostExpression = expression.Body as MethodCallExpression;
+
+            if (outermostExpression == null)
+            {
+                throw new ArgumentException("Invalid Expression. Expression should consist of a Method call only.");
+            }
+
+            return outermostExpression.Method;
+        }
+
         // todo look into dispose version
         // https://stackoverflow.com/questions/27175558/foreach-loop-using-expression-trees
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)

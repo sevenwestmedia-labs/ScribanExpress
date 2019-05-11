@@ -30,7 +30,13 @@ namespace ScribanExpress
                             (value);
         }
 
-        public ExpressContext<T,L> GetExpressContext<T>(string templateText)
+        public string Render<T>(ExpressContext<T, L> expressContext, T value)
+        {
+            return MapFunction(expressContext.CompiledTemplate, standardLibrary)
+                            (value);
+        }
+
+        public ExpressContext<T, L> GetExpressContext<T>(string templateText)
         {
             Func<string, ExpressContext<T, L>> CompileTemplate = _ =>
             {
