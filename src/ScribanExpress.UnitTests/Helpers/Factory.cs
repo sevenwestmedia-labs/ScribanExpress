@@ -12,7 +12,7 @@ namespace ScribanExpress.UnitTests.Helpers
 {
     public class Factory
     {
-        public static IExpressTemplateManager CreateExpressTemplateManager()
+        public static ExpressTemplateManager<RootLibary> CreateExpressTemplateManager()
         {
             return new ExpressTemplateManager<RootLibary>(new NullLogger<ExpressTemplateManager<RootLibary>>(), new RootLibary(), new StatementGenerator(new NullLogger<StatementGenerator>()));
         }
