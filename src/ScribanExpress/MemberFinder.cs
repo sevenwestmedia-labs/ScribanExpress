@@ -15,7 +15,7 @@ namespace ScribanExpress
         {
             return FindMemberInfo(type, memberName, arguments)
                 // Use Scriban Naming Convention
-                ?? FindMemberInfo(type, memberName.Replace("_",string.Empty), arguments); 
+                ?? FindMemberInfo(type, memberName.Replace("_", string.Empty), arguments);
         }
 
         private MemberInfo FindMemberInfo(Type type, string memberName, IEnumerable<Type> arguments)
@@ -25,8 +25,14 @@ namespace ScribanExpress
             {
                 return property;
             }
-            
+
             var methodInfo = ReflectionHelpers.GetMethod(type, memberName, arguments);
+            if (methodInfo != null)
+            {
+                return methodInfo;
+            }
+
+            methodInfo = MatchMethodWithDefaultParameters(type, memberName, arguments.ToNullSafe().ToList());
             if (methodInfo != null)
             {
                 return methodInfo;
@@ -46,6 +52,54 @@ namespace ScribanExpress
             return null;
         }
 
+        // https://stackoverflow.com/questions/2421994/invoking-methods-with-optional-parameters-through-reflection
+        private MethodInfo MatchMethodWithDefaultParameters(Type type, string memberName, IList<Type> arguments)
+        {
+            var potentialMatches = type.GetMethods(BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.OptionalParamBinding)
+             .Where(m => m.Name.Equals(memberName, StringComparison.OrdinalIgnoreCase))
+             .Where(m => !m.IsGenericMethod); // TODO: we don't support Generic combined with Default values... yet
+
+            foreach (MethodInfo methodInfo in potentialMatches)
+            {
+                var parameters = methodInfo.GetParameters();
+
+                if (DoArgsMatchMethod(methodInfo, arguments))
+                {
+                    return methodInfo;
+                }
+            }
+            return null;
+        }
+
+
+        //https://docs.microsoft.com/en-us/dotnet/api/system.type.isassignablefrom?view=netcore-2.2
+        private bool DoArgsMatchMethod(MethodInfo methodInfo, IList<Type> arguments)
+        {
+            var parameters = methodInfo.GetParameters();
+
+            // can't have more arguments than a method parameters
+            if (arguments.Count() > parameters.Count())
+            {
+                return false;
+            }
+
+            foreach (var (index, parameter) in parameters.GetIndexedEnumerable())
+            {
+                var argument = arguments.ElementAtOrDefault(index);
+
+                if (argument == null && parameter.IsOptional)
+                {
+                    continue;
+                }
+                
+                if (!parameter.ParameterType.IsAssignableFrom(argument))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         private MethodInfo MatchGenericMethod(Type type, string memberName, IList<Type> arguments)
         {

@@ -13,10 +13,6 @@ namespace ScribanExpress.UnitTests
     public class MemberFinderTests
     {
         MemberFinder memberFinder = new MemberFinder();
-        public MemberFinderTests()
-        {
-            this.memberFinder = new MemberFinder();
-        }
 
         [Fact]
         public void FindProperty()
@@ -104,6 +100,13 @@ namespace ScribanExpress.UnitTests
             var argArray = new[] { input.GetType(), stringType };
 
             var result = memberFinder.FindMember(typeof(MemberCase), "NestedGenericType", argArray);
+            result.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void FindMember_WithDefaultArgument()
+        {
+            var result = memberFinder.FindMember(typeof(MemberCase), "SingleArg", null);
             result.ShouldNotBeNull();
         }
     }

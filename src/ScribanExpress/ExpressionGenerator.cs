@@ -148,12 +148,24 @@ namespace ScribanExpress
                 return ExpressionHelpers.CallMember(targetType, methodInfo, convertedArgs);
             }
         }
+        
         IEnumerable<Expression>  ConvertArgs(MethodInfo target, IEnumerable<Expression> expressions)
         {
             var methodParameters = target.GetParameters();
-            foreach ((var index, var item) in expressions.ToNullSafe().GetIndexedEnumerable())
+
+            var mappedArgs =  methodParameters.LeftZip(expressions.ToNullSafe(), (parameter, argument) => (parameter, argument));
+
+            foreach (var (parameter, argumentExpression) in mappedArgs)
             {
-                yield return ConvertIfNeeded(item, methodParameters[index].ParameterType);
+                // no argument was supplied
+                if (argumentExpression == null && parameter.IsOptional)
+                {
+                    yield return Expression.Constant(parameter.DefaultValue);
+                }
+                else
+                {
+                    yield return ConvertIfNeeded(argumentExpression, parameter.ParameterType);
+                }
             }
         }
         public Expression ConvertIfNeeded(Expression from, Type toType)

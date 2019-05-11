@@ -11,6 +11,8 @@ namespace ScribanExpress.UnitTests.Models
 
         public void DoStuff() { }
 
+        public static void SingleArg(string abc ="abc") { }
+
         public static string GetLucky() => "lucky";
 
         public static string Lucky
