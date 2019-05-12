@@ -50,3 +50,7 @@ steps:
     coverageThreshold: '69'
 
 - script: cd $(Build.SourcesDirectory) && ls
+
+- task: NuKeeper@0
+  inputs:
+    arguments: '-m 3'
