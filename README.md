@@ -1,9 +1,27 @@
 # Scriban Express
 
-* Scriban Express is desgined for rendering lots of small simple templates, quickly
-* Subset of Scriban (mainly due to lack of time)
-* Compiles Scribans AST into Cached Expression Trees
-* At this point Security has not been considered, templates should be controlled by trusted individuals
+* Scriban Express is desgined for rendering lots of small simple templates, quickly.
+* Subset of Scriban (mainly due to lack of time).
+* Converts Scribans AST into Expression Trees, Compiles, then caches.
+* At this point Security has not been considered, templates should be controlled by trusted individuals.
+
+## Usage
+ 
+* See Demo Project for working examples
+
+Configure Asp.Net
+```csharp
+   services.AddScribanExpress();
+```
+
+Render
+```csharp
+// load via dependancy injection
+IExpressTemplateManager expressTemplateManager
+
+// pass in template, and object (in this example anonymous) 
+expressTemplateManager.Render("{{ person.name }}", new { Person })
+```
 
 ## Build and Test
 
@@ -35,19 +53,18 @@ dotnet build
  * Better error Logging
  * List functions
  * assignment
- * ci/cd
  * named variables
  * documentation
- * add scriban default library
+ * add scriban default libraries
  * look into truthy tests
  * improve exensibility (standard library)
  * Null propagation/null conditional
- * Dictionary Support
  * Raise better errors/messaging
- * More implicit conversion
+ * More implicit conversions
 
 ## Future
 
+* consider converting Ienumberables to Arrays on indexing
 * consider using a nested ConcurentDictionary<Type,ConcurentDictionary<string,function>>  for performance
 * Post benchmarks to a datasource
 * Consider rich errors (copy scriban instead of exceptions)

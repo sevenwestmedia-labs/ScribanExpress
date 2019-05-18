@@ -26,6 +26,5 @@ namespace ScribanExpress.UnitTests.Helpers
         {
             return Factory.CreateStatementGenerator().Generate<T, RootLibary>(new ExpressContext(), scriptBlockStatement);
         }
-
     }
 }

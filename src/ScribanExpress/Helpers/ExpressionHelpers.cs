@@ -39,6 +39,7 @@ namespace ScribanExpress.Helpers
 
         }
 
+
         //http://blog.functionalfun.net/2009/10/getting-methodinfo-of-generic-method.html
         /// <summary>
         /// Given a lambda expression that calls a method, returns the method info.
