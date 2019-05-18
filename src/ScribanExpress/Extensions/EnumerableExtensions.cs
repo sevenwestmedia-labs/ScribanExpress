@@ -19,7 +19,16 @@ namespace ScribanExpress.Extensions
             }
         }
 
-        public static IEnumerable<TResult> LeftZip<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) where TFirst : class where TSecond : class
+        public static IEnumerable<(TFirst Left, TSecond Right)> LeftZip<TFirst, TSecond>(this IEnumerable<TFirst> first,
+                                                                                         IEnumerable<TSecond> second)
+                                                                                         where TFirst : class where TSecond : class
+        {
+            return first.LeftZip(second, (Left, Right) => (Left, Right));
+        }
+            public static IEnumerable<TResult> LeftZip<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first,
+                                                                             IEnumerable<TSecond> second,
+                                                                             Func<TFirst, TSecond, TResult> resultSelector)
+                                                                             where TFirst : class where TSecond : class
         {
             var secondEnumerator = second.GetEnumerator();
             foreach (var firstItem in first)
@@ -28,7 +37,8 @@ namespace ScribanExpress.Extensions
                 {
                     yield return resultSelector(firstItem, secondEnumerator.Current);
                 }
-                else {
+                else
+                {
                     yield return resultSelector(firstItem, default);
                 }
             }

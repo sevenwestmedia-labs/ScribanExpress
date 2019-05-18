@@ -118,6 +118,13 @@ namespace ScribanExpress
                         default:
                             throw new SpanException($"Unknown ScriptBinaryExpression Operator: {scriptBinaryExpression.Operator}", scriptBinaryExpression.Span);
                     }
+                case ScriptIndexerExpression scriptIndexerExpression:
+                    //https://stackoverflow.com/questions/31924907/accessing-elements-of-types-with-indexers-using-expression-trees
+                    // TODO: consider wrapping an enumerable to an array
+                    var arrayTarget = GetExpressionBody(scriptIndexerExpression.Target, parameterFinder, null);
+                    var arrayIndex = GetExpressionBody(scriptIndexerExpression.Index, parameterFinder, null);
+                    var indexed = Expression.Property(arrayTarget, "Item", arrayIndex);
+                    return indexed;
                 default:
                     throw new SpanException($"Unknown Expression Type: {scriptExpression?.GetType()}", scriptExpression.Span);
             }
