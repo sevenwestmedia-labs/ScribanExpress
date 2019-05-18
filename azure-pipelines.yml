@@ -1,52 +1,91 @@
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - master
 
 pr:
 - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+resources:
+- repo: self
 
 variables:
   buildConfiguration: 'Release'
+  majorVersion: 0
+  minorVersion: 2
+  
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:   
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - script: dotnet build --configuration $(buildConfiguration)
+      displayName: 'dotnet build $(buildConfiguration)'
 
-steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+    - task: DotNetCoreCLI@2
+      name: Test
+      inputs:
+        command: 'test'
+    #    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
+        arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
 
-- task: DotNetCoreCLI@2
-  name: Test
-  inputs:
-    command: 'test'
-#    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
-    arguments: ' /p:CollectCoverage=true  /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\  /p:Exclude="[xunit*]*%2c[Scriban]*%2c[*UnitTests*]*" '
+        # Would prefer to put a wildcard for cobertura.xml but not sure it works on sub directorys
+#    - task: PublishCodeCoverageResults@1
+#      inputs:
+#        codeCoverageTool: 'Cobertura'
+#        #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+#        summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
 
-    # Would prefer to put a wildcard for cobertura.xml but not sure it works on sub directorys
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    #summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
+    - task: DotNetCoreCLI@2
+      displayName: Pack
+      inputs:
+        command: 'pack'
+        versioningScheme: 'byPrereleaseNumber'
+        requestedMajorVersion: '$(majorVersion)'
+        requestedMinorVersion: '$(minorVersion)'
 
-- task: DotNetCoreCLI@2
-  displayName: Pack
-  inputs:
-    command: 'pack'
-    versioningScheme: 'byPrereleaseNumber'
-    requestedMajorVersion: '0'
-    requestedMinorVersion: '1'
+    - task: PublishPipelineArtifact@0
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
 
-- task: PublishPipelineArtifact@0
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
+ #   - task: BuildQualityChecks@5
+ #     inputs:
+ #       checkCoverage: true
+ #       coverageType: branches
+ #       coverageFailOption: 'fixed'
+ #       coverageThreshold: '69'
 
-- task: BuildQualityChecks@5
-  inputs:
-    checkCoverage: true
-    coverageType: branches
-    coverageFailOption: 'fixed'
-    coverageThreshold: '69'
-
-- script: cd $(Build.SourcesDirectory) && ls
+- stage: Deploy
+  # condition here until gates are implemented 
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  dependsOn: 'Build'
+  jobs:
+    # track deployments on the environment
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: 'www-nuget-org'
+    strategy:
+      # default deployment strategy
+      runOnce:
+        deploy:
+          steps:
+          - script: ls $(Pipeline.Workspace) 
+          # Due to bug https://github.com/Microsoft/azure-pipelines-tasks/issues/7160
+          # we are forced to use NuGetCommand and windows Image
+          #- task: DotNetCoreCLI@2
+          #  inputs:
+          #    command: 'push'
+          #    feedsToUse: 'select'
+          #    packagesToPush: '$(Pipeline.Workspace)/drop/ScribanExpress.!(Benchmarks).*.nupkg'
+          #    nuGetFeedType: 'external'
+          #    publishFeedCredentials: 'www.nuget.org'
+          #    versioningScheme: 'off'
+          - task: NuGetCommand@2
+            inputs:
+              command: 'push'
+              feedsToUse: 'select'
+              packagesToPush: '$(Pipeline.Workspace)/drop/ScribanExpress.!(Benchmarks).*.nupkg'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'www.nuget.org'
+              versioningScheme: 'off'
