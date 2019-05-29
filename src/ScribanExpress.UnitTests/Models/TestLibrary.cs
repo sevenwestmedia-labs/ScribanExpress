@@ -49,6 +49,9 @@ namespace ScribanExpress.UnitTests.Models
         {
             return item * 2;
         }
+        public bool DefaultValue(string value, bool usingDefaultValue = true) => usingDefaultValue;
+
+        public bool MultipleDefaultValues(string value, bool usingDefaultValue = true, bool using2ndDefaultValue = true, bool using3rddDefaultValue = true) => usingDefaultValue && using2ndDefaultValue && using3rddDefaultValue;
     }
     public class Deep
     {

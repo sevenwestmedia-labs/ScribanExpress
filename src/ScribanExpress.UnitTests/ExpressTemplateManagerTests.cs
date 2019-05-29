@@ -85,5 +85,32 @@ namespace ScribanExpress.UnitTests
 
             resultNumber.ShouldBe("hello");
         }
+
+        [Theory]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' true }}")]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' true true }}")]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' true true true }}")]
+        public void Multiple_Default_Values_In_Method_Call(string template)
+        {
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+
+            var result = expressTemplateManager.Render(template, new { });
+
+            result.ShouldBe("True");
+        }
+
+        [Theory]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' false }}")]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' true false }}")]
+        [InlineData(@"{{ test.MultipleDefaultValues 'test' true true false }}")]
+        public void Multiple_Default_Values_In_Method_Call_Returns_False(string template)
+        {
+            var expressTemplateManager = Factory.CreateExpressTemplateManager();
+
+            var result = expressTemplateManager.Render(template, new { });
+
+            result.ShouldBe("False");
+        }
+
     }
 }
