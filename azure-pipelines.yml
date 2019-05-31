@@ -18,6 +18,7 @@ stages:
   - job: Build
     pool:   
       vmImage: 'Ubuntu-16.04'
+    container: mcr.microsoft.com/dotnet/core/sdk:2.2
     steps:
     - script: dotnet build --configuration $(buildConfiguration)
       displayName: 'dotnet build $(buildConfiguration)'
