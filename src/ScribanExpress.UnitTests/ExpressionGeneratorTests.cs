@@ -6,8 +6,10 @@ using ScribanExpress.UnitTests.Helpers;
 using ScribanExpress.UnitTests.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace ScribanExpress.UnitTests
@@ -158,6 +160,8 @@ namespace ScribanExpress.UnitTests
         [Fact]
         public void Method_WithParameters_OnProperty()
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+
             var personWrapper = new { person };
 
             var templateText = @"blah blah {{ person.Age.ToString ""C"" }}";
